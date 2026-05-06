@@ -703,24 +703,38 @@
     }
 
     // ── CAMPAIGNS ─────────────────────────────────────────────────────────
+    function sortedCamps() {
+      return [...camps].sort((a, b) => {
+        if (a.active && !b.active) return -1;
+        if (!a.active && b.active) return 1;
+        return (b.id - a.id); // newer first
+      });
+    }
+
     function renderCamps() {
       const l = document.getElementById('camp-list');
       l.innerHTML = '';
-      camps.forEach(c => {
+      sortedCamps().forEach(c => {
         const ps   = c.pids.map(id=>prospects.find(p=>p.id===id)).filter(Boolean);
         const done = ps.filter(p=>p.status!=='pending').length;
         const pct  = Math.round((done/(ps.length||1))*100);
         const d = document.createElement('div');
         d.className = 'camp-card' + (c.active ? ' active-c' : '');
+        d.style.cssText = 'flex-direction:column;align-items:stretch;gap:0;cursor:default';
         d.innerHTML = `
-          <div class="camp-ico"><i class="ti ti-speakerphone"></i></div>
-          <div class="camp-info">
-            <div class="camp-name">${c.name}${c.active?' <span class="bdg b-sched" style="font-size:11px">Activa</span>':''}</div>
-            <div class="camp-meta">${ps.length} prospectos · ${done} llamados · ${c.days.slice(0,2).join(', ')}</div>
-            <div class="camp-bar"><div class="camp-bar-fill" style="width:${pct}%"></div></div>
+          <div style="display:flex;align-items:center;gap:14px;cursor:pointer" onclick="setActiveCamp(${c.id})">
+            <div class="camp-ico"><i class="ti ti-speakerphone"></i></div>
+            <div class="camp-info">
+              <div class="camp-name">${c.name}${c.active?' <span class="bdg b-sched" style="font-size:11px">Activa</span>':''}</div>
+              <div class="camp-meta">${ps.length} prospectos · ${done} llamados · ${c.days.slice(0,2).join(', ')}</div>
+              <div class="camp-bar"><div class="camp-bar-fill" style="width:${pct}%"></div></div>
+            </div>
+            <i class="ti ti-${c.active?'check':'player-play'}" style="font-size:18px;color:${c.active?'var(--green)':'var(--text2)'}"></i>
           </div>
-          <i class="ti ti-chevron-right" style="font-size:18px;color:var(--text2)"></i>`;
-        d.onclick = () => setActiveCamp(c.id);
+          <div style="display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:.5px solid var(--border)">
+            <button class="card-act-btn edit-act" style="flex:1" onclick="openEditCamp(${c.id})"><i class="ti ti-edit"></i> Renombrar</button>
+            <button class="card-act-btn danger" style="flex:1" onclick="deleteCamp(${c.id})"><i class="ti ti-trash"></i> Eliminar</button>
+          </div>`;
         l.appendChild(d);
       });
     }
@@ -731,6 +745,28 @@
       document.getElementById('camp-active-name').textContent = c.name;
       prospects.forEach(p=>{ p.today = c.pids.includes(p.id); });
       save(); renderCamps(); renderToday(); refreshProg();
+    }
+
+    function openEditCamp(id) {
+      const c = camps.find(x=>x.id===id);
+      const newName = prompt('Nuevo nombre para la campaña:', c.name);
+      if (newName && newName.trim()) {
+        c.name = newName.trim();
+        if (c.active) document.getElementById('camp-active-name').textContent = c.name;
+        save(); renderCamps();
+      }
+    }
+
+    function deleteCamp(id) {
+      const c = camps.find(x=>x.id===id);
+      if (!confirm('¿Eliminar la campaña "' + c.name + '"? Los prospectos no se borran.')) return;
+      camps = camps.filter(x=>x.id!==id);
+      if (c.active) {
+        prospects.forEach(p=>{ p.today = false; });
+        document.getElementById('camp-active-name').textContent = '—';
+        renderToday(); refreshProg();
+      }
+      save(); renderCamps();
     }
 
     function toggleNewCamp() {
