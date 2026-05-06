@@ -394,15 +394,18 @@
     });
   }
 
+  // Firebase sometimes stores arrays as objects — normalize back
+  function toArray(val){if(!val)return[];if(Array.isArray(val))return val;return Object.values(val);}
+
   // ── FIREBASE LOAD & LISTEN ────────────────────────────────────────────
   REF.on('value', snap => {
     if (remoteWriting) return;
     const data = snap.val();
     if (data) {
-      prospects = data.prospects || [];
-      camps     = data.camps     || [];
-      trash     = data.trash     || [];
-      csvLists  = data.csvLists  || [];
+      prospects = toArray(data.prospects);
+      camps     = toArray(data.camps);
+      trash     = toArray(data.trash);
+      csvLists  = toArray(data.csvLists);
       nid       = Math.max(nid, ...prospects.map(p=>p.id||0), Date.now());
     }
     if (!appReady) {
@@ -507,7 +510,7 @@
     return d;
   }
 
-  function setStatus(id,val){const p=prospects.find(x=>x.id===id);p.status=val;save();refreshProg();reRenderCard(id);if(!document.getElementById('v-followup').classList.contains('hidden'))renderFollowUp();refreshFuDot();}
+  function setStatus(id,val){const p=prospects.find(x=>x.id===id);p.status=val;if(val==='pending'){p.followup=null;}save();refreshProg();reRenderCard(id);if(!document.getElementById('v-followup').classList.contains('hidden'))renderFollowUp();refreshFuDot();}
   function saveNote(id,v){const p=prospects.find(x=>x.id===id);if(p){p.note=v;save();}}
   function saveFollowup(id){const input=document.getElementById('fu-'+id);if(!input||!input.value)return;const p=prospects.find(x=>x.id===id);p.followup=input.value;if(p.status==='pending')p.status='followup';save();reRenderCard(id);refreshFuDot();}
   function clearFollowup(id){const p=prospects.find(x=>x.id===id);p.followup=null;if(p.status==='followup')p.status='called';save();reRenderCard(id);refreshFuDot();}
