@@ -385,6 +385,32 @@
   let nid=Date.now(),deskFilter='all',deskSearch='',editingId=null,isNewProspect=false,pendingImport=[],campSeg='manual',csvLists=[];
   let prospects=[],camps=[],trash=[],appReady=false;
 
+  function uid(){ return '_'+Math.random().toString(36).slice(2,10)+Date.now().toString(36); }
+
+  function toObj(arr){
+    if(!arr)return{};
+    const o={};
+    arr.forEach(x=>{
+      const item={...x};
+      if(Array.isArray(item.pids)){const po={};item.pids.forEach(pid=>{po[String(pid)]=true;});item.pids=po;}
+      if(Array.isArray(item.ids)){const io={};item.ids.forEach(id=>{io[String(id)]=true;});item.ids=io;}
+      o[String(x.id)]=item;
+    });
+    return o;
+  }
+
+  function toArray(val){
+    if(!val)return[];
+    const arr=Array.isArray(val)?val:Object.values(val);
+    return arr.map(x=>{
+      if(!x)return x;
+      const item={...x};
+      if(item.pids&&!Array.isArray(item.pids)){item.pids=Object.keys(item.pids);}
+      if(item.ids&&!Array.isArray(item.ids)){item.ids=Object.keys(item.ids);}
+      return item;
+    });
+  }
+
   function save(){
     if(!appReady)return;
     setSyncStatus('syncing');remoteWriting=true;
@@ -392,13 +418,9 @@
       prospects: toObj(prospects),
       camps:     toObj(camps),
       trash:     toObj(trash),
-      csvLists:  toObj(csvLists.map((l,i)=>({...l, id: l.id||i})))
+      csvLists:  toObj(csvLists.map(l=>({...l, id: l.id||uid()})))
     },err=>{setSyncStatus(err?'off':'ok');setTimeout(()=>{remoteWriting=false;},500);});
   }
-
-  // Firebase converts numeric-keyed arrays to objects — always normalize on read
-  function toObj(arr){ const o={}; arr.forEach(x=>{ o[x.id]=x; }); return o; }
-  function toArray(val){if(!val)return[];if(Array.isArray(val))return val;return Object.values(val);}
 
   REF.on('value',snap=>{
     if(remoteWriting)return;
@@ -408,7 +430,6 @@
       camps=toArray(data.camps);
       trash=toArray(data.trash);
       csvLists=toArray(data.csvLists);
-      nid=Math.max(nid,...prospects.map(p=>p.id||0),Date.now());
     }
     if(!appReady){appReady=true;document.getElementById('loading-screen').style.display='none';document.getElementById('app-root').classList.remove('hidden');document.getElementById('app-root').style.display='flex';initToday();refreshCurrentPanel();}
     else{refreshCurrentPanel();}
@@ -426,7 +447,7 @@
   // ── TABLE ROW ─────────────────────────────────────────────────────────
   function makeRow(p,showCamp){
     const s=si[p.status]||si.pending;
-    const campName=showCamp?(camps.find(c=>c.pids&&c.pids.includes(p.id))?.name||'—'):'';
+    const campName=showCamp?(camps.find(c=>c.pids&&c.pids.includes(String(p.id)))?.name||'—'):'';
     const fuHtml=p.followup?`<span style="font-size:12px;color:var(--orange);font-weight:500"><i class="ti ti-bell" style="font-size:11px"></i> ${fmtDatetime(p.followup)}</span>`:`<button onclick="openFuModal(${p.id})" style="font-size:12px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:inherit">+ Recordar</button>`;
     return `<tr id="row-${p.id}">
       <td><div class="name-cell"><div class="av ${p.av}">${ini(p.name)}</div><div class="name-info"><div class="pname">${p.name}</div><div class="pco">${p.co}</div></div></div></td>
@@ -513,7 +534,7 @@
     });
     if(!camps.length)grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-speakerphone" style="font-size:40px;margin-bottom:12px;display:block"></i>Sin campañas. Creá una nueva.</div>';
   }
-  function setActiveCamp(id){camps.forEach(c=>c.active=(c.id===id));const c=camps.find(x=>x.id===id);prospects.forEach(p=>{p.today=c.pids.includes(p.id);});save();renderCamps();if(currentPanel==='today')renderToday();}
+  function setActiveCamp(id){camps.forEach(c=>c.active=(c.id===id));const c=camps.find(x=>x.id===id);prospects.forEach(p=>{p.today=c.pids.includes(String(p.id));});save();renderCamps();if(currentPanel==='today')renderToday();}
   function renameCamp(id){const c=camps.find(x=>x.id===id);const n=prompt('Nuevo nombre:',c.name);if(n&&n.trim()){c.name=n.trim();save();renderCamps();if(currentPanel==='today'){const ac=camps.find(c=>c.active);document.getElementById('today-camp-name').textContent=ac?ac.name:'—';}}}
   function deleteCamp(id){const c=camps.find(x=>x.id===id);if(!confirm('¿Eliminar "'+c.name+'"?'))return;camps=camps.filter(x=>x.id!==id);if(c.active)prospects.forEach(p=>{p.today=false;});save();renderCamps();}
 
@@ -522,8 +543,10 @@
   function setCampSeg(el,seg){campSegDesk=seg;document.querySelectorAll('#camp-seg .seg-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');document.getElementById('nc-manual-wrap').classList.toggle('hidden',seg!=='manual');document.getElementById('nc-list-wrap').classList.toggle('hidden',seg!=='list');}
   function populateManualList(){const pl=document.getElementById('nc-prospects');pl.innerHTML='';prospects.forEach(p=>{const r=document.createElement('div');r.className='pselrow';r.innerHTML=`<div class="chk" id="ncp-${p.id}" onclick="this.classList.toggle('on');this.innerHTML=this.classList.contains('on')?'<i class=\\'ti ti-check\\'></i>':''"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">${p.name}</div><div style="font-size:12px;color:var(--text2)">${p.co}</div></div>`;pl.appendChild(r);});}
   function populateCsvListSelectDesk(){const sel=document.getElementById('nc-list-select');sel.innerHTML='<option value="">— Elegir lista —</option>';csvLists.forEach((list,i)=>{const o=document.createElement('option');o.value=i;o.textContent=list.name+' ('+list.ids.length+' contactos)';sel.appendChild(o);});}
-  function loadListProspectsDesk(idx){const pl=document.getElementById('nc-list-prospects');pl.innerHTML='';if(idx==='')return;const list=csvLists[parseInt(idx)];if(!list)return;list.ids.forEach(id=>{const p=prospects.find(x=>x.id===id);if(!p)return;const r=document.createElement('div');r.className='pselrow';r.innerHTML=`<div class="chk on" id="ncpl-${p.id}" onclick="this.classList.toggle('on');this.innerHTML=this.classList.contains('on')?'<i class=\\'ti ti-check\\'></i>':''"><i class="ti ti-check"></i></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">${p.name}</div><div style="font-size:12px;color:var(--text2)">${p.co}</div></div>`;pl.appendChild(r);});}
-  function createCampaign(){const name=document.getElementById('nc-name').value.trim();if(!name){alert('Ingresá un nombre');return;}const days=[...document.querySelectorAll('#new-camp-form .dtog.on')].map(el=>el.textContent);let pids=[];if(campSegDesk==='manual'){pids=prospects.filter(p=>document.getElementById('ncp-'+p.id)?.classList.contains('on')).map(p=>p.id);}else{const idx=document.getElementById('nc-list-select').value;if(idx!==''){const list=csvLists[parseInt(idx)];pids=list.ids.filter(id=>document.getElementById('ncpl-'+id)?.classList.contains('on'));}}camps.push({id:Date.now(),name,days,pids,active:false});document.getElementById('nc-name').value='';document.querySelectorAll('#new-camp-form .dtog').forEach(el=>el.classList.remove('on'));toggleNewCampForm();save();renderCamps();}
+  function loadListProspectsDesk(idx){const pl=document.getElementById('nc-list-prospects');pl.innerHTML='';if(idx==='')return;const list=csvLists[parseInt(idx)];if(!list)return;list.ids.forEach(id=>{const p=prospects.find(x=>String(x.id)===String(id));if(!p)return;const r=document.createElement('div');r.className='pselrow';r.innerHTML=`<div class="chk on" id="ncpl-${p.id}" onclick="this.classList.toggle('on');this.innerHTML=this.classList.contains('on')?'<i class=\\'ti ti-check\\'></i>':''"><i class="ti ti-check"></i></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">${p.name}</div><div style="font-size:12px;color:var(--text2)">${p.co}</div></div>`;pl.appendChild(r);});}
+  function createCampaign(){const name=document.getElementById('nc-name').value.trim();if(!name){alert('Ingresá un nombre');return;}const days=[...document.querySelectorAll('#new-camp-form .dtog.on')].map(el=>el.textContent);let pids=[];if(campSegDesk==='manual'){pids=prospects.filter(p=>document.getElementById('ncp-'+p.id)?.classList.contains('on')).map(p=>String(p.id));}else{const idx=document.getElementById('nc-list-select').value;if(idx!==''){const list=csvLists[parseInt(idx)];pids=list.ids.filter(id=>document.getElementById('ncpl-'+id)?.classList.contains('on')).map(String);}}camps.push({id:uid(),name,days,pids,active:false});document.getElementById('nc-name').value='';document.querySelectorAll('#new-camp-form .dtog').forEach(el=>el.classList.remove('on'));toggleNewCampForm();save();renderCamps();}
+
+  // ── STATS ─────────────────────────────────────────────────────────────
 
   // ── STATS ─────────────────────────────────────────────────────────────
   function renderStats(){
@@ -540,10 +563,10 @@
   function openAddModal(){isNewProspect=true;editingId=null;document.getElementById('modal-title').textContent='Nuevo prospecto';document.getElementById('edit-name').value='';document.getElementById('edit-co').value='';document.getElementById('edit-ph').value='';document.getElementById('edit-modal').classList.remove('hidden');}
   function openEditModal(id){isNewProspect=false;editingId=id;const p=prospects.find(x=>x.id===id);document.getElementById('modal-title').textContent='Editar prospecto';document.getElementById('edit-name').value=p.name;document.getElementById('edit-co').value=p.co;document.getElementById('edit-ph').value=p.ph;document.getElementById('edit-modal').classList.remove('hidden');}
   function closeModal(e){if(e&&e.target!==document.getElementById('edit-modal'))return;document.getElementById('edit-modal').classList.add('hidden');}
-  function saveModal(){const n=document.getElementById('edit-name').value.trim();const c=document.getElementById('edit-co').value.trim();const ph=document.getElementById('edit-ph').value.trim();if(!n||!ph){alert('Nombre y teléfono son obligatorios');return;}if(isNewProspect){if(isDuplicate(n,ph)&&!confirm('Parece duplicado. ¿Agregás igual?'))return;prospects.push({id:nid++,name:n,co:c,ph,status:'pending',note:'',today:false,av:avs[nid%avs.length]});}else{const p=prospects.find(x=>x.id===editingId);p.name=n;p.co=c;p.ph=ph;}save();document.getElementById('edit-modal').classList.add('hidden');refreshCurrentPanel();refreshSidebarStats();}
+  function saveModal(){const n=document.getElementById('edit-name').value.trim();const c=document.getElementById('edit-co').value.trim();const ph=document.getElementById('edit-ph').value.trim();if(!n||!ph){alert('Nombre y teléfono son obligatorios');return;}if(isNewProspect){if(isDuplicate(n,ph)&&!confirm('Parece duplicado. ¿Agregás igual?'))return;prospects.push({id:uid(),name:n,co:c,ph,status:'pending',note:'',today:false,av:avs[prospects.length%avs.length]});}else{const p=prospects.find(x=>x.id===editingId);p.name=n;p.co=c;p.ph=ph;}save();document.getElementById('edit-modal').classList.add('hidden');refreshCurrentPanel();refreshSidebarStats();}
 
   // ── DELETE ────────────────────────────────────────────────────────────
-  function deleteProspect(id){const p=prospects.find(x=>x.id===id);if(!p)return;if(!confirm('¿Eliminar a '+p.name+'?'))return;trash.push({...p,deletedAt:new Date().toISOString()});prospects=prospects.filter(x=>x.id!==id);camps.forEach(c=>{c.pids=c.pids.filter(pid=>pid!==id);});save();refreshCurrentPanel();refreshSidebarStats();}
+  function deleteProspect(id){const p=prospects.find(x=>x.id===id);if(!p)return;if(!confirm('¿Eliminar a '+p.name+'?'))return;trash.push({...p,deletedAt:new Date().toISOString()});prospects=prospects.filter(x=>x.id!==id);camps.forEach(c=>{c.pids=c.pids.filter(pid=>String(pid)!==String(id));});save();refreshCurrentPanel();refreshSidebarStats();}
 
   // ── TRASH ─────────────────────────────────────────────────────────────
   function renderTrash(){const l=document.getElementById('trash-list-d');l.innerHTML='';document.getElementById('trash-empty-d').classList.toggle('hidden',trash.length>0);document.getElementById('empty-trash-btn').classList.toggle('hidden',trash.length===0);[...trash].reverse().forEach((p,ri)=>{const realIdx=trash.length-1-ri;const d=document.createElement('div');d.className='trash-row';d.innerHTML=`<div class="av ${p.av}" style="width:36px;height:36px;font-size:12px">${ini(p.name)}</div><div class="trash-info"><div class="trash-name">${p.name}</div><div class="trash-meta">${p.co} · Eliminado ${new Date(p.deletedAt).toLocaleDateString('es-ES')}</div></div><button class="tb-btn" onclick="restoreTrash(${realIdx})" style="color:var(--green)"><i class="ti ti-refresh"></i> Restaurar</button>`;l.appendChild(d);});}
@@ -552,11 +575,11 @@
 
   // ── CSV IMPORT ────────────────────────────────────────────────────────
   function isDuplicate(name,ph){const n=name.toLowerCase().trim();const p=ph.replace(/\s/g,'');return prospects.some(x=>x.name.toLowerCase().trim()===n||x.ph.replace(/\s/g,'')===p);}
-  function handleCSV(input){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const lines=e.target.result.split('\n').filter(l=>l.trim());const parsed=[];lines.slice(1).forEach(line=>{const cols=line.split(',').map(c=>c.trim().replace(/^"|"$/g,''));if(cols[0]&&cols[2]){parsed.push({id:nid++,name:cols[0],co:cols[1]||'',ph:cols[2]||'',status:'pending',note:cols[4]||'',today:false,av:avs[nid%avs.length],isDup:isDuplicate(cols[0],cols[2]),skip:false});}});pendingImport=parsed;const dupCount=parsed.filter(p=>p.isDup).length;const notice=document.getElementById('dup-notice');if(dupCount>0){notice.classList.remove('hidden');notice.textContent=`⚠️ ${dupCount} contacto${dupCount!==1?'s':''} duplicado${dupCount!==1?'s':''}. Marcados en amarillo.`;}else{notice.classList.add('hidden');}document.getElementById('preview-block').classList.remove('hidden');document.getElementById('preview-lbl').textContent=parsed.length+' detectados';renderPreviewList();};reader.readAsText(file);}
+  function handleCSV(input){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const lines=e.target.result.split('\n').filter(l=>l.trim());const parsed=[];lines.slice(1).forEach(line=>{const cols=line.split(',').map(c=>c.trim().replace(/^"|"$/g,''));if(cols[0]&&cols[2]){parsed.push({id:uid(),name:cols[0],co:cols[1]||'',ph:cols[2]||'',status:'pending',note:cols[4]||'',today:false,av:avs[parsed.length%avs.length],isDup:isDuplicate(cols[0],cols[2]),skip:false});}});pendingImport=parsed;const dupCount=parsed.filter(p=>p.isDup).length;const notice=document.getElementById('dup-notice');if(dupCount>0){notice.classList.remove('hidden');notice.textContent=`⚠️ ${dupCount} contacto${dupCount!==1?'s':''} duplicado${dupCount!==1?'s':''}. Marcados en amarillo.`;}else{notice.classList.add('hidden');}document.getElementById('preview-block').classList.remove('hidden');document.getElementById('preview-lbl').textContent=parsed.length+' detectados';renderPreviewList();};reader.readAsText(file);}
   function renderPreviewList(){const pl=document.getElementById('preview-list');pl.innerHTML='';pendingImport.forEach((p,i)=>{const d=document.createElement('div');d.className='prev-card'+(p.isDup?' dup':'');d.innerHTML=`<div><div style="font-size:14px;font-weight:600;color:var(--text)">${p.name}${p.isDup?' <span style="font-size:11px;color:var(--amber)">Duplicado</span>':''}</div><div style="font-size:13px;color:var(--text2);margin-top:2px">${p.co} · ${p.ph}</div></div>${p.isDup&&!p.skip?`<button style="font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;font-family:inherit" onclick="skipDup(${i})">Saltar</button>`:p.skip?`<span style="font-size:12px;color:var(--text3)">Saltado</span>`:''}`;pl.appendChild(d);});}
   function skipDup(i){pendingImport[i].skip=true;renderPreviewList();}
   function skipAllDups(){pendingImport.forEach(p=>{if(p.isDup)p.skip=true;});renderPreviewList();}
-  function doImport(){const toImport=pendingImport.filter(p=>!p.skip);const listName='Lista '+new Date().toLocaleDateString('es-ES',{day:'numeric',month:'short'});const newIds=[];toImport.forEach(p=>{const{isDup,skip,...clean}=p;prospects.push(clean);newIds.push(clean.id);});if(newIds.length>0)csvLists.push({name:listName,ids:newIds});pendingImport=[];document.getElementById('preview-block').classList.add('hidden');document.getElementById('file-in').value='';save();refreshSidebarStats();alert('✓ '+toImport.length+' prospectos importados como "'+listName+'".');}
+  function doImport(){const toImport=pendingImport.filter(p=>!p.skip);const listId=uid();const listName='Lista '+new Date().toLocaleDateString('es-ES',{day:'numeric',month:'short'});const newIds=[];toImport.forEach(p=>{const{isDup,skip,...clean}=p;prospects.push(clean);newIds.push(String(clean.id));});if(newIds.length>0)csvLists.push({id:listId,name:listName,ids:newIds});pendingImport=[];document.getElementById('preview-block').classList.add('hidden');document.getElementById('file-in').value='';save();refreshSidebarStats();alert('✓ '+toImport.length+' prospectos importados como "'+listName+'".');}
 
   setInterval(refreshFuBadge,60000);
 </script>
