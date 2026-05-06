@@ -385,9 +385,19 @@
   let nid=Date.now(),deskFilter='all',deskSearch='',editingId=null,isNewProspect=false,pendingImport=[],campSeg='manual',csvLists=[];
   let prospects=[],camps=[],trash=[],appReady=false;
 
-  function save(){if(!appReady)return;setSyncStatus('syncing');remoteWriting=true;REF.set({prospects,camps,trash,csvLists:csvLists||[]},err=>{setSyncStatus(err?'off':'ok');setTimeout(()=>{remoteWriting=false;},500);});}
+  function save(){
+    if(!appReady)return;
+    setSyncStatus('syncing');remoteWriting=true;
+    REF.set({
+      prospects: toObj(prospects),
+      camps:     toObj(camps),
+      trash:     toObj(trash),
+      csvLists:  toObj(csvLists.map((l,i)=>({...l, id: l.id||i})))
+    },err=>{setSyncStatus(err?'off':'ok');setTimeout(()=>{remoteWriting=false;},500);});
+  }
 
-  // Firebase sometimes stores arrays as objects when keys are large numbers — normalize back
+  // Firebase converts numeric-keyed arrays to objects — always normalize on read
+  function toObj(arr){ const o={}; arr.forEach(x=>{ o[x.id]=x; }); return o; }
   function toArray(val){if(!val)return[];if(Array.isArray(val))return val;return Object.values(val);}
 
   REF.on('value',snap=>{
