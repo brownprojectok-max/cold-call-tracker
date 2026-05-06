@@ -510,10 +510,10 @@
     const fuSection = p.status!=='pending'?`
       <div style="display:flex;flex-direction:column;gap:6px">
         <div class="field-lbl">Follow Up</div>
-        ${p.followup?`<div class="fu-badge"><i class="ti ti-bell" style="font-size:13px"></i> ${fmtDatetime(p.followup)}</div><button onclick="clearFollowup(${p.id})" style="font-size:12px;color:var(--red);background:none;border:none;cursor:pointer;font-family:inherit;margin-top:4px">Eliminar recordatorio</button>`:`
+        ${p.followup?`<div class="fu-badge"><i class="ti ti-bell" style="font-size:13px"></i> ${fmtDatetime(p.followup)}</div><button onclick="clearFollowup('${p.id}')" style="font-size:12px;color:var(--red);background:none;border:none;cursor:pointer;font-family:inherit;margin-top:4px">Eliminar recordatorio</button>`:`
         <div class="followup-row">
           <input type="datetime-local" id="fu-${p.id}" />
-          <button class="fu-save-btn" onclick="saveFollowup(${p.id})">+ Recordar</button>
+          <button class="fu-save-btn" onclick="saveFollowup('${p.id}')">+ Recordar</button>
         </div>`}
       </div>`:'';
     d.innerHTML=`
@@ -527,8 +527,8 @@
         </div>
       </div>
       <div class="pexpand">
-        <textarea placeholder="Nota..." onchange="saveNote(${p.id},this.value)">${p.note||''}</textarea>
-        <select onchange="setStatus(${p.id},this.value)">
+        <textarea placeholder="Nota..." onchange="saveNote('${p.id}',this.value)">${p.note||''}</textarea>
+        <select onchange="setStatus('${p.id}',this.value)">
           <option value="pending"${p.status==='pending'?' selected':''}>Sin llamar</option>
           <option value="called"${p.status==='called'?' selected':''}>Llamado</option>
           <option value="scheduled"${p.status==='scheduled'?' selected':''}>Cita agendada</option>
@@ -537,8 +537,8 @@
         </select>
         ${fuSection}
         <div class="card-actions">
-          <button class="card-act-btn edit-act" onclick="openEditModal(${p.id})"><i class="ti ti-edit"></i> Editar</button>
-          <button class="card-act-btn danger" onclick="deleteProspect(${p.id})"><i class="ti ti-trash"></i> Eliminar</button>
+          <button class="card-act-btn edit-act" onclick="openEditModal('${p.id}')"><i class="ti ti-edit"></i> Editar</button>
+          <button class="card-act-btn danger" onclick="deleteProspect('${p.id}')"><i class="ti ti-trash"></i> Eliminar</button>
         </div>
       </div>`;
     return d;
@@ -595,13 +595,13 @@
   function renderCamps(){
     const l=document.getElementById('camp-list');l.innerHTML='';
     sortedCamps().forEach(c=>{
-      const ps=c.pids.map(id=>prospects.find(p=>p.id===id)).filter(Boolean);
+      const ps=c.pids.map(id=>prospects.find(p=>String(p.id)===String(id))).filter(Boolean);
       const done=ps.filter(p=>p.status!=='pending').length;
       const pct=Math.round((done/(ps.length||1))*100);
       const d=document.createElement('div');
       d.className='camp-card'+(c.active?' active-c':'');
       d.style.cssText='flex-direction:column;align-items:stretch;gap:0;cursor:default';
-      d.innerHTML=`<div style="display:flex;align-items:center;gap:14px;cursor:pointer" onclick="setActiveCamp(${c.id})"><div class="camp-ico"><i class="ti ti-speakerphone"></i></div><div class="camp-info"><div class="camp-name">${c.name}${c.active?' <span class="bdg b-sched" style="font-size:11px">Activa</span>':''}</div><div class="camp-meta">${ps.length} prospectos · ${done} llamados · ${c.days.slice(0,2).join(', ')}</div><div class="camp-bar"><div class="camp-bar-fill" style="width:${pct}%"></div></div></div><i class="ti ti-${c.active?'check':'player-play'}" style="font-size:18px;color:${c.active?'var(--green)':'var(--text2)'}"></i></div><div style="display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:.5px solid var(--border)"><button class="card-act-btn edit-act" style="flex:1" onclick="openEditCamp(${c.id})"><i class="ti ti-edit"></i> Renombrar</button><button class="card-act-btn danger" style="flex:1" onclick="deleteCamp(${c.id})"><i class="ti ti-trash"></i> Eliminar</button></div>`;
+      d.innerHTML=`<div style="display:flex;align-items:center;gap:14px;cursor:pointer" onclick="setActiveCamp('${c.id}')"><div class="camp-ico"><i class="ti ti-speakerphone"></i></div><div class="camp-info"><div class="camp-name">${c.name}${c.active?' <span class="bdg b-sched" style="font-size:11px">Activa</span>':''}</div><div class="camp-meta">${ps.length} prospectos · ${done} llamados · ${c.days.slice(0,2).join(', ')}</div><div class="camp-bar"><div class="camp-bar-fill" style="width:${pct}%"></div></div></div><i class="ti ti-${c.active?'check':'player-play'}" style="font-size:18px;color:${c.active?'var(--green)':'var(--text2)'}"></i></div><div style="display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:.5px solid var(--border)"><button class="card-act-btn edit-act" style="flex:1" onclick="openEditCamp('${c.id}')"><i class="ti ti-edit"></i> Renombrar</button><button class="card-act-btn danger" style="flex:1" onclick="deleteCamp('${c.id}')"><i class="ti ti-trash"></i> Eliminar</button></div>`;
       l.appendChild(d);
     });
   }
