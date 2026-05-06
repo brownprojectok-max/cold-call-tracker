@@ -371,7 +371,7 @@
     'not-interested':{l:'No interesado',c:'b-nope'},
     followup:{l:'Follow Up',c:'b-followup'},
   };
-  let nid = Date.now();
+  function uid(){ return '_' + Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
   let afilt = 'all';
   let editingId = null;
   let pendingImport = [];
@@ -384,9 +384,38 @@
   let appReady = false;
 
   // ── FIREBASE SAVE ─────────────────────────────────────────────────────
-  // Store as id-keyed objects so Firebase never converts arrays to sparse objects
-  function toObj(arr){ const o={}; arr.forEach(x=>{ o[x.id]=x; }); return o; }
-  function toArray(val){if(!val)return[];if(Array.isArray(val))return val;return Object.values(val);}
+  // Always store keyed by string ID so Firebase never mangles arrays
+  function toObj(arr){
+    if(!arr)return{};
+    const o={};
+    arr.forEach(x=>{
+      const item={...x};
+      // pids inside campaigns: store as object {id:true}
+      if(Array.isArray(item.pids)){const po={};item.pids.forEach(pid=>{po[String(pid)]=true;});item.pids=po;}
+      // ids inside csvLists: store as object {id:true}
+      if(Array.isArray(item.ids)){const io={};item.ids.forEach(id=>{io[String(id)]=true;});item.ids=io;}
+      o[String(x.id)]=item;
+    });
+    return o;
+  }
+
+  function toArray(val){
+    if(!val)return[];
+    if(Array.isArray(val)){
+      return val.map(x=>normItem(x));
+    }
+    return Object.values(val).map(x=>normItem(x));
+  }
+
+  function normItem(x){
+    if(!x)return x;
+    const item={...x};
+    // restore pids from object to array
+    if(item.pids && !Array.isArray(item.pids)){item.pids=Object.keys(item.pids);}
+    // restore ids from object to array
+    if(item.ids && !Array.isArray(item.ids)){item.ids=Object.keys(item.ids);}
+    return item;
+  }
 
   function save() {
     if (!appReady) return;
@@ -396,7 +425,7 @@
       prospects: toObj(prospects),
       camps:     toObj(camps),
       trash:     toObj(trash),
-      csvLists:  toObj(csvLists.map((l,i)=>({...l, id: l.id||i})))
+      csvLists:  toObj(csvLists.map(l=>({...l, id: l.id||uid()})))
     }, err => {
       setSyncStatus(err ? 'off' : 'ok');
       setTimeout(() => { remoteWriting = false; }, 500);
@@ -412,7 +441,7 @@
       camps     = toArray(data.camps);
       trash     = toArray(data.trash);
       csvLists  = toArray(data.csvLists);
-      nid       = Math.max(nid, ...prospects.map(p=>p.id||0), Date.now());
+      nid       = uid(); // reset generator
     }
     if (!appReady) {
       appReady = true;
@@ -576,7 +605,7 @@
       l.appendChild(d);
     });
   }
-  function setActiveCamp(id){camps.forEach(c=>c.active=(c.id===id));const c=camps.find(x=>x.id===id);document.getElementById('camp-active-name').textContent=c.name;prospects.forEach(p=>{p.today=c.pids.includes(p.id);});save();renderCamps();renderToday();refreshProg();}
+  function setActiveCamp(id){camps.forEach(c=>c.active=(c.id===id));const c=camps.find(x=>x.id===id);document.getElementById('camp-active-name').textContent=c.name;prospects.forEach(p=>{p.today=c.pids.includes(String(p.id));});save();renderCamps();renderToday();refreshProg();}
   function openEditCamp(id){const c=camps.find(x=>x.id===id);const n=prompt('Nuevo nombre:',c.name);if(n&&n.trim()){c.name=n.trim();if(c.active)document.getElementById('camp-active-name').textContent=c.name;save();renderCamps();}}
   function deleteCamp(id){const c=camps.find(x=>x.id===id);if(!confirm('¿Eliminar "'+c.name+'"?'))return;camps=camps.filter(x=>x.id!==id);if(c.active){prospects.forEach(p=>{p.today=false;});document.getElementById('camp-active-name').textContent='—';renderToday();refreshProg();}save();renderCamps();}
 
@@ -585,15 +614,15 @@
   function populateManualList(){const pl=document.getElementById('nc-prospects');pl.innerHTML='';prospects.forEach(p=>{const r=document.createElement('div');r.className='pselrow';r.innerHTML=`<div class="chk" id="ncp-${p.id}" onclick="this.classList.toggle('on');this.innerHTML=this.classList.contains('on')?'<i class=\\'ti ti-check\\'></i>':''"></div><div><div class="pselname">${p.name}</div><div class="pselco">${p.co}</div></div>`;pl.appendChild(r);});}
   function populateCsvListSelect(){const sel=document.getElementById('nc-list-select');sel.innerHTML='<option value="">— Elegir lista —</option>';csvLists.forEach((list,i)=>{const o=document.createElement('option');o.value=i;o.textContent=list.name+' ('+list.ids.length+' contactos)';sel.appendChild(o);});}
   function loadListProspects(idx){const pl=document.getElementById('nc-list-prospects');pl.innerHTML='';if(idx==='')return;const list=csvLists[parseInt(idx)];if(!list)return;list.ids.forEach(id=>{const p=prospects.find(x=>x.id===id);if(!p)return;const r=document.createElement('div');r.className='pselrow';r.innerHTML=`<div class="chk on" id="ncpl-${p.id}" onclick="this.classList.toggle('on');this.innerHTML=this.classList.contains('on')?'<i class=\\'ti ti-check\\'></i>':''"><i class="ti ti-check"></i></div><div><div class="pselname">${p.name}</div><div class="pselco">${p.co}</div></div>`;pl.appendChild(r);});}
-  function createCampaign(){const name=document.getElementById('nc-name').value.trim();if(!name){alert('Ingresá un nombre');return;}const days=[...document.querySelectorAll('#new-camp .dtog.on')].map(el=>el.textContent);let pids=[];if(campSeg==='manual'){pids=prospects.filter(p=>document.getElementById('ncp-'+p.id)?.classList.contains('on')).map(p=>p.id);}else{const idx=document.getElementById('nc-list-select').value;if(idx!==''){const list=csvLists[parseInt(idx)];pids=list.ids.filter(id=>document.getElementById('ncpl-'+id)?.classList.contains('on'));}}camps.push({id:Date.now(),name,days,pids,active:false});document.getElementById('nc-name').value='';document.querySelectorAll('#new-camp .dtog').forEach(el=>el.classList.remove('on'));toggleNewCamp();save();renderCamps();}
+  function createCampaign(){const name=document.getElementById('nc-name').value.trim();if(!name){alert('Ingresá un nombre');return;}const days=[...document.querySelectorAll('#new-camp .dtog.on')].map(el=>el.textContent);let pids=[];if(campSeg==='manual'){pids=prospects.filter(p=>document.getElementById('ncp-'+p.id)?.classList.contains('on')).map(p=>String(p.id));}else{const idx=document.getElementById('nc-list-select').value;if(idx!==''){const list=csvLists[parseInt(idx)];pids=list.ids.filter(id=>document.getElementById('ncpl-'+id)?.classList.contains('on')).map(String);}}camps.push({id:uid(),name,days,pids,active:false});document.getElementById('nc-name').value='';document.querySelectorAll('#new-camp .dtog').forEach(el=>el.classList.remove('on'));toggleNewCamp();save();renderCamps();}
 
   // ── CSV ───────────────────────────────────────────────────────────────
   function isDuplicate(name,ph){const n=name.toLowerCase().trim();const p=ph.replace(/\s/g,'');return prospects.some(x=>x.name.toLowerCase().trim()===n||x.ph.replace(/\s/g,'')===p);}
-  function handleCSV(input){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const lines=e.target.result.split('\n').filter(l=>l.trim());const parsed=[];lines.slice(1).forEach(line=>{const cols=line.split(',').map(c=>c.trim().replace(/^"|"$/g,''));if(cols[0]&&cols[2]){parsed.push({id:nid++,name:cols[0],co:cols[1]||'',ph:cols[2]||'',status:'pending',note:cols[4]||'',today:false,av:avs[nid%avs.length],isDup:isDuplicate(cols[0],cols[2]),skip:false});}});pendingImport=parsed;const dupCount=parsed.filter(p=>p.isDup).length;const notice=document.getElementById('dup-notice');if(dupCount>0){notice.classList.remove('hidden');notice.textContent=`⚠️ ${dupCount} contacto${dupCount!==1?'s':''} duplicado${dupCount!==1?'s':''}. Marcados en amarillo.`;}else{notice.classList.add('hidden');}document.getElementById('preview-block').classList.remove('hidden');document.getElementById('preview-lbl').textContent=parsed.length+' detectados';renderPreviewList();};reader.readAsText(file);}
+  function handleCSV(input){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const lines=e.target.result.split('\n').filter(l=>l.trim());const parsed=[];lines.slice(1).forEach(line=>{const cols=line.split(',').map(c=>c.trim().replace(/^"|"$/g,''));if(cols[0]&&cols[2]){const id=uid();parsed.push({id,name:cols[0],co:cols[1]||'',ph:cols[2]||'',status:'pending',note:cols[4]||'',today:false,av:avs[parsed.length%avs.length],isDup:isDuplicate(cols[0],cols[2]),skip:false});}});pendingImport=parsed;const dupCount=parsed.filter(p=>p.isDup).length;const notice=document.getElementById('dup-notice');if(dupCount>0){notice.classList.remove('hidden');notice.textContent=`⚠️ ${dupCount} contacto${dupCount!==1?'s':''} duplicado${dupCount!==1?'s':''}. Marcados en amarillo.`;}else{notice.classList.add('hidden');}document.getElementById('preview-block').classList.remove('hidden');document.getElementById('preview-lbl').textContent=parsed.length+' detectados';renderPreviewList();};reader.readAsText(file);}
   function renderPreviewList(){const pl=document.getElementById('preview-list');pl.innerHTML='';pendingImport.forEach((p,i)=>{const d=document.createElement('div');d.className='prev-card'+(p.isDup?' dup':'');d.innerHTML=`<div><div style="font-size:15px;font-weight:600;color:var(--text)">${p.name}${p.isDup?' <span style="font-size:11px;color:var(--amber)">Dup</span>':''}</div><div style="font-size:13px;color:var(--text2);margin-top:3px">${p.co} · ${p.ph}</div></div>${p.isDup&&!p.skip?`<button class="prev-skip" onclick="skipDup(${i})">Saltar</button>`:p.skip?`<span style="font-size:12px;color:var(--text3)">Saltado</span>`:''}`;pl.appendChild(d);});}
   function skipDup(i){pendingImport[i].skip=true;renderPreviewList();}
-  function doImport(){const toImport=pendingImport.filter(p=>!p.skip);const listName='Lista '+new Date().toLocaleDateString('es-ES',{day:'numeric',month:'short'});const newIds=[];toImport.forEach(p=>{const{isDup,skip,...clean}=p;prospects.push(clean);newIds.push(clean.id);});if(newIds.length>0)csvLists.push({name:listName,ids:newIds});pendingImport=[];document.getElementById('preview-block').classList.add('hidden');document.getElementById('file-in').value='';save();renderToday();refreshProg();alert('✓ '+toImport.length+' prospectos importados como "'+listName+'".');}
-  function addManual(){const n=document.getElementById('m-name').value.trim();const c=document.getElementById('m-co').value.trim();const ph=document.getElementById('m-ph').value.trim();if(!n||!ph){alert('Nombre y teléfono son obligatorios');return;}if(isDuplicate(n,ph)){if(!confirm('Parece duplicado. ¿Agregás igual?'))return;}prospects.push({id:nid++,name:n,co:c,ph,status:'pending',note:'',today:false,av:avs[nid%avs.length]});document.getElementById('m-name').value='';document.getElementById('m-co').value='';document.getElementById('m-ph').value='';save();alert('✓ '+n+' agregado.');}
+  function doImport(){const toImport=pendingImport.filter(p=>!p.skip);const listId=uid();const listName='Lista '+new Date().toLocaleDateString('es-ES',{day:'numeric',month:'short'});const newIds=[];toImport.forEach(p=>{const{isDup,skip,...clean}=p;prospects.push(clean);newIds.push(String(clean.id));});if(newIds.length>0)csvLists.push({id:listId,name:listName,ids:newIds});pendingImport=[];document.getElementById('preview-block').classList.add('hidden');document.getElementById('file-in').value='';save();renderToday();refreshProg();alert('✓ '+toImport.length+' prospectos importados como "'+listName+'".');}
+  function addManual(){const n=document.getElementById('m-name').value.trim();const c=document.getElementById('m-co').value.trim();const ph=document.getElementById('m-ph').value.trim();if(!n||!ph){alert('Nombre y teléfono son obligatorios');return;}if(isDuplicate(n,ph)){if(!confirm('Parece duplicado. ¿Agregás igual?'))return;}prospects.push({id:uid(),name:n,co:c,ph,status:'pending',note:'',today:false,av:avs[prospects.length%avs.length]});document.getElementById('m-name').value='';document.getElementById('m-co').value='';document.getElementById('m-ph').value='';save();alert('✓ '+n+' agregado.');}
 
   // ── TRASH ─────────────────────────────────────────────────────────────
   function renderTrash(){const l=document.getElementById('trash-list');l.innerHTML='';document.getElementById('trash-empty-msg').classList.toggle('hidden',trash.length>0);document.getElementById('empty-trash-btn').classList.toggle('hidden',trash.length===0);[...trash].reverse().forEach((p,ri)=>{const realIdx=trash.length-1-ri;const d=document.createElement('div');d.className='trash-card';d.innerHTML=`<div class="av ${p.av}" style="width:38px;height:38px;font-size:13px">${ini(p.name)}</div><div class="trash-info"><div class="trash-name">${p.name}</div><div class="trash-meta">${p.co} · ${new Date(p.deletedAt).toLocaleDateString('es-ES')}</div></div><div><button class="trash-btn restore" onclick="restoreTrash(${realIdx})"><i class="ti ti-refresh"></i> Restaurar</button></div>`;l.appendChild(d);});}
