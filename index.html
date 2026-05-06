@@ -1017,19 +1017,74 @@
     }
 
     // ── NAVIGATION ────────────────────────────────────────────────────────
+    const VIEWS = ['today','prospects','campaigns','followup','import','stats','trash'];
+    let currentViewIdx = 0;
+
     function switchView(name) {
-      const views = ['today','prospects','campaigns','followup','import','trash','stats'];
-      views.forEach(v=>{
+      const idx = VIEWS.indexOf(name);
+      if (idx !== -1) currentViewIdx = idx;
+      VIEWS.forEach(v=>{
         document.getElementById('v-'+v).classList.toggle('hidden',v!==name);
         const t = document.getElementById('ntab-'+v);
         if(t) t.classList.toggle('on',v===name);
       });
+      // Scroll active tab into view
+      const activeTab = document.getElementById('ntab-'+name);
+      if (activeTab) activeTab.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
       if(name==='prospects') renderAll(afilt,'');
       if(name==='campaigns') renderCamps();
       if(name==='followup')  renderFollowUp();
       if(name==='trash')     renderTrash();
       if(name==='stats')     renderStats();
     }
+
+    // ── SWIPE GESTURES ────────────────────────────────────────────────────
+    let swipeStartX = 0;
+    let swipeStartY = 0;
+    let swipeStartTime = 0;
+    let isSwiping = false;
+
+    document.addEventListener('touchstart', e => {
+      swipeStartX    = e.touches[0].clientX;
+      swipeStartY    = e.touches[0].clientY;
+      swipeStartTime = Date.now();
+      isSwiping      = false;
+    }, {passive: true});
+
+    document.addEventListener('touchmove', e => {
+      const dx = e.touches[0].clientX - swipeStartX;
+      const dy = e.touches[0].clientY - swipeStartY;
+      // Only mark as horizontal swipe if clearly more horizontal than vertical
+      if (!isSwiping && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.8) {
+        isSwiping = true;
+      }
+    }, {passive: true});
+
+    document.addEventListener('touchend', e => {
+      if (!isSwiping) return;
+      const dx       = e.changedTouches[0].clientX - swipeStartX;
+      const dy       = e.changedTouches[0].clientY - swipeStartY;
+      const elapsed  = Date.now() - swipeStartTime;
+      const absDx    = Math.abs(dx);
+      const absDy    = Math.abs(dy);
+
+      // Must be fast enough, long enough, and clearly horizontal
+      if (elapsed > 500 || absDx < 50 || absDy > absDx * 0.6) return;
+
+      // Ignore swipes that start on a scrollable horizontal element
+      const target = e.target;
+      const scrollable = target.closest('.day-scroll, .filter-chips, .nav, select, textarea, input');
+      if (scrollable) return;
+
+      if (dx < 0 && currentViewIdx < VIEWS.length - 1) {
+        // Swipe left → next view
+        switchView(VIEWS[currentViewIdx + 1]);
+      } else if (dx > 0 && currentViewIdx > 0) {
+        // Swipe right → previous view
+        switchView(VIEWS[currentViewIdx - 1]);
+      }
+      isSwiping = false;
+    }, {passive: true});
 
     // ── INIT ──────────────────────────────────────────────────────────────
     buildDayChips();
