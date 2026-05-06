@@ -10,268 +10,219 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
   <style>
     :root {
-      --bg: #ffffff;
-      --bg2: #f5f5f5;
-      --bg3: #eeeeee;
-      --text: #111111;
-      --text2: #666666;
-      --text3: #999999;
-      --border: rgba(0,0,0,0.12);
-      --border2: rgba(0,0,0,0.22);
-      --green: #1D9E75;
-      --green-light: #E1F5EE;
-      --green-dark: #085041;
-      --green-mid: #0F6E56;
-      --green-100: #9FE1CB;
-      --blue: #185FA5;
-      --blue-light: #E6F1FB;
-      --red-light: #FCEBEB;
-      --red: #A32D2D;
-      --gray-light: #F1EFE8;
-      --gray: #5F5E5A;
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
+      --bg:#ffffff;--bg2:#f5f5f5;--bg3:#eeeeee;
+      --text:#111111;--text2:#666666;--text3:#aaaaaa;
+      --border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.22);
+      --green:#1D9E75;--green-light:#E1F5EE;--green-dark:#085041;--green-mid:#0F6E56;--green-100:#9FE1CB;
+      --blue:#185FA5;--blue-light:#E6F1FB;
+      --red:#A32D2D;--red-light:#FCEBEB;
+      --amber:#633806;--amber-light:#FAEEDA;
+      --gray-light:#F1EFE8;--gray:#5F5E5A;
+      --orange:#BA7517;--orange-light:#FAEEDA;
+      --r-sm:8px;--r-md:12px;--r-lg:16px;
     }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #1c1c1e;
-        --bg2: #2c2c2e;
-        --bg3: #3a3a3c;
-        --text: #ffffff;
-        --text2: #ababab;
-        --text3: #6e6e6e;
-        --border: rgba(255,255,255,0.12);
-        --border2: rgba(255,255,255,0.22);
-        --green-light: #0a2e22;
-        --green-dark: #9FE1CB;
-        --green-mid: #5DCAA5;
-        --green-100: #085041;
-        --blue-light: #0c2540;
-        --red-light: #2d0f0f;
-        --red: #f09595;
-        --gray-light: #2c2c2e;
-        --gray: #ababab;
+    @media(prefers-color-scheme:dark){
+      :root{
+        --bg:#1c1c1e;--bg2:#2c2c2e;--bg3:#3a3a3c;
+        --text:#ffffff;--text2:#ababab;--text3:#6e6e6e;
+        --border:rgba(255,255,255,0.12);--border2:rgba(255,255,255,0.22);
+        --green-light:#0a2e22;--green-dark:#9FE1CB;--green-mid:#5DCAA5;--green-100:#085041;
+        --blue-light:#0c2540;--red-light:#2d0f0f;--red:#f09595;
+        --amber-light:#2e1a00;--gray-light:#2c2c2e;--gray:#ababab;--orange-light:#2e1a00;
       }
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      max-width: 430px;
-      margin: 0 auto;
-      padding-bottom: env(safe-area-inset-bottom);
-    }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:430px;margin:0 auto;padding-bottom:env(safe-area-inset-bottom)}
 
     /* TOPBAR */
-    .topbar {
-      padding: 16px 18px 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      background: var(--bg);
-      z-index: 100;
-      padding-top: max(16px, env(safe-area-inset-top));
-    }
-    .logo { font-size: 24px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
-    .topbar-icons { display: flex; gap: 10px; }
-    .ticon {
-      width: 40px; height: 40px; border-radius: 50%;
-      background: var(--bg2); border: none;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: var(--text2); font-size: 20px;
-    }
-    .ticon:active { opacity: 0.7; }
+    .topbar{padding:16px 18px 0;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:100;padding-top:max(16px,env(safe-area-inset-top))}
+    .logo{font-size:24px;font-weight:700;color:var(--text);letter-spacing:-.5px}
+    .topbar-icons{display:flex;gap:8px}
+    .ticon{width:40px;height:40px;border-radius:50%;background:var(--bg2);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:20px;position:relative}
+    .ticon:active{opacity:.7}
+    .badge-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:#E24B4A;border:2px solid var(--bg)}
 
-    /* NAV TABS */
-    .nav {
-      display: flex; padding: 0 18px; margin-top: 14px;
-      border-bottom: 0.5px solid var(--border);
-      gap: 0; overflow-x: auto; scrollbar-width: none;
-      position: sticky; top: 56px; background: var(--bg); z-index: 99;
-    }
-    .nav::-webkit-scrollbar { display: none; }
-    .ntab {
-      flex-shrink: 0; padding: 10px 14px; font-size: 14px; font-weight: 500;
-      color: var(--text2); border: none; background: none;
-      border-bottom: 2px solid transparent; cursor: pointer;
-      transition: all .15s; white-space: nowrap; font-family: inherit;
-    }
-    .ntab.on { color: var(--text); border-bottom-color: var(--green); }
+    /* NAV */
+    .nav{display:flex;padding:0 18px;margin-top:14px;border-bottom:.5px solid var(--border);overflow-x:auto;scrollbar-width:none;position:sticky;top:56px;background:var(--bg);z-index:99}
+    .nav::-webkit-scrollbar{display:none}
+    .ntab{flex-shrink:0;padding:10px 14px;font-size:14px;font-weight:500;color:var(--text2);border:none;background:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit}
+    .ntab.on{color:var(--text);border-bottom-color:var(--green)}
 
     /* VIEWS */
-    .view { padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; }
-    .hidden { display: none !important; }
+    .view{padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+    .hidden{display:none!important}
 
-    /* PROGRESS CARD */
-    .prog-card { background: var(--green-light); border-radius: var(--radius-lg); padding: 16px; }
-    .prog-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-    .prog-camp-label { font-size: 12px; color: var(--green-mid); margin-bottom: 3px; }
-    .prog-camp-name { font-size: 16px; font-weight: 600; color: var(--green-dark); }
-    .prog-counter { text-align: right; }
-    .prog-big { font-size: 32px; font-weight: 700; color: var(--green-dark); line-height: 1; }
-    .prog-small { font-size: 12px; color: var(--green-mid); margin-top: 2px; }
-    .prog-track { height: 6px; background: var(--green-100); border-radius: 3px; }
-    .prog-fill { height: 100%; border-radius: 3px; background: var(--green-dark); transition: width .4s; }
+    /* PROGRESS */
+    .prog-card{background:var(--green-light);border-radius:var(--r-lg);padding:16px}
+    .prog-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+    .prog-camp-label{font-size:12px;color:var(--green-mid);margin-bottom:3px}
+    .prog-camp-name{font-size:16px;font-weight:600;color:var(--green-dark)}
+    .prog-big{font-size:32px;font-weight:700;color:var(--green-dark);line-height:1}
+    .prog-small{font-size:12px;color:var(--green-mid);margin-top:2px}
+    .prog-track{height:6px;background:var(--green-100);border-radius:3px}
+    .prog-fill{height:100%;border-radius:3px;background:var(--green-dark);transition:width .4s}
 
     /* DAY CHIPS */
-    .day-scroll { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
-    .day-scroll::-webkit-scrollbar { display: none; }
-    .daybtn {
-      flex-shrink: 0; padding: 9px 18px; border-radius: 100px;
-      font-size: 14px; font-weight: 500;
-      border: 1.5px solid var(--border2); background: var(--bg);
-      color: var(--text2); cursor: pointer; transition: all .15s; font-family: inherit;
-    }
-    .daybtn.on { background: var(--green); border-color: var(--green); color: #fff; }
+    .day-scroll{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+    .day-scroll::-webkit-scrollbar{display:none}
+    .daybtn{flex-shrink:0;padding:9px 18px;border-radius:100px;font-size:14px;font-weight:500;border:1.5px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s;font-family:inherit}
+    .daybtn.on{background:var(--green);border-color:var(--green);color:#fff}
+    .daybtn.today-btn{border-color:var(--green);color:var(--green)}
 
     /* SECTION HEADER */
-    .sec-hdr { display: flex; justify-content: space-between; align-items: center; }
-    .sec-title { font-size: 17px; font-weight: 600; color: var(--text); }
-    .sec-link { font-size: 14px; color: var(--blue); background: none; border: none; cursor: pointer; font-family: inherit; }
+    .sec-hdr{display:flex;justify-content:space-between;align-items:center}
+    .sec-title{font-size:17px;font-weight:600;color:var(--text)}
+    .sec-link{font-size:14px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:inherit}
 
     /* PROSPECT CARD */
-    .pcard {
-      background: var(--bg); border: 0.5px solid var(--border);
-      border-radius: var(--radius-lg); padding: 14px; transition: border-color .15s;
-    }
-    .pcard.done { border-color: #5DCAA5; border-width: 1px; }
-    .pcard-row { display: flex; align-items: center; gap: 12px; }
-    .av {
-      width: 46px; height: 46px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 15px; font-weight: 600; flex-shrink: 0;
-    }
-    .av-teal { background: #9FE1CB; color: #085041; }
-    .av-blue { background: #B5D4F4; color: #0C447C; }
-    .av-amber { background: #FAC775; color: #633806; }
-    .av-purple { background: #CECBF6; color: #3C3489; }
-    .av-coral { background: #F5C4B3; color: #712B13; }
-    .pinfo { flex: 1; min-width: 0; }
-    .pname { font-size: 16px; font-weight: 600; color: var(--text); }
-    .pco { font-size: 13px; color: var(--text2); margin-top: 1px; }
-    .pphone { font-size: 14px; color: var(--blue); margin-top: 3px; font-weight: 500; }
-    .pright { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
-    .bdg { font-size: 11px; padding: 4px 9px; border-radius: 100px; font-weight: 600; white-space: nowrap; }
-    .b-pend { background: var(--gray-light); color: var(--gray); }
-    .b-sched { background: var(--green-light); color: var(--green-mid); }
-    .b-nope { background: var(--red-light); color: var(--red); }
-    .b-calld { background: var(--blue-light); color: var(--blue); }
-    .callbtn {
-      width: 44px; height: 44px; border-radius: 50%; background: var(--green);
-      border: none; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 20px; color: #fff; text-decoration: none; flex-shrink: 0;
-    }
-    .callbtn:active { opacity: 0.8; transform: scale(0.95); }
+    .pcard{background:var(--bg);border:.5px solid var(--border);border-radius:var(--r-lg);padding:14px;transition:border-color .15s}
+    .pcard.done{border-color:#5DCAA5;border-width:1px}
+    .pcard.followup-pending{border-color:var(--orange);border-width:1px}
+    .pcard-row{display:flex;align-items:center;gap:12px}
+    .av{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0}
+    .av-teal{background:#9FE1CB;color:#085041}
+    .av-blue{background:#B5D4F4;color:#0C447C}
+    .av-amber{background:#FAC775;color:#633806}
+    .av-purple{background:#CECBF6;color:#3C3489}
+    .av-coral{background:#F5C4B3;color:#712B13}
+    .pinfo{flex:1;min-width:0}
+    .pname{font-size:16px;font-weight:600;color:var(--text)}
+    .pco{font-size:13px;color:var(--text2);margin-top:1px}
+    .pphone{font-size:14px;color:var(--blue);margin-top:3px;font-weight:500}
+    .pright{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}
+    .bdg{font-size:11px;padding:4px 9px;border-radius:100px;font-weight:600;white-space:nowrap}
+    .b-pend{background:var(--gray-light);color:var(--gray)}
+    .b-sched{background:var(--green-light);color:var(--green-mid)}
+    .b-nope{background:var(--red-light);color:var(--red)}
+    .b-calld{background:var(--blue-light);color:var(--blue)}
+    .b-followup{background:var(--orange-light);color:var(--orange)}
+    .callbtn{width:44px;height:44px;border-radius:50%;background:var(--green);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;color:#fff;text-decoration:none;flex-shrink:0}
+    .callbtn:active{opacity:.8;transform:scale(.95)}
 
     /* EXPAND */
-    .pexpand { margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
-    .pexpand textarea {
-      font-size: 15px; padding: 11px 13px;
-      border: 0.5px solid var(--border2); border-radius: var(--radius-md);
-      background: var(--bg2); color: var(--text); resize: none; height: 64px;
-      font-family: inherit; width: 100%;
-    }
-    .pexpand select {
-      font-size: 15px; padding: 12px 13px;
-      border: 0.5px solid var(--border2); border-radius: var(--radius-md);
-      background: var(--bg2); color: var(--text); cursor: pointer;
-      width: 100%; appearance: none; -webkit-appearance: none; font-family: inherit;
-    }
+    .pexpand{margin-top:12px;padding-top:12px;border-top:.5px solid var(--border);display:flex;flex-direction:column;gap:10px}
+    .pexpand textarea{font-size:15px;padding:11px 13px;border:.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg2);color:var(--text);resize:none;height:64px;font-family:inherit;width:100%}
+    .pexpand select{font-size:15px;padding:12px 13px;border:.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg2);color:var(--text);cursor:pointer;width:100%;appearance:none;-webkit-appearance:none;font-family:inherit}
+
+    /* FOLLOW UP ROW */
+    .followup-row{display:flex;gap:8px;align-items:center}
+    .followup-row input[type="datetime-local"]{flex:1;font-size:14px;padding:10px 12px;border:.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg2);color:var(--text);font-family:inherit}
+    .fu-save-btn{padding:10px 16px;background:var(--green);color:#fff;border:none;border-radius:var(--r-md);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+    .fu-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:5px 10px;border-radius:100px;background:var(--orange-light);color:var(--orange);font-weight:600}
+
+    /* CARD ACTION BUTTONS */
+    .card-actions{display:flex;gap:8px}
+    .card-act-btn{flex:1;padding:9px;border-radius:var(--r-md);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;border:.5px solid var(--border2);background:var(--bg2);color:var(--text2);display:flex;align-items:center;justify-content:center;gap:5px}
+    .card-act-btn.danger{color:var(--red);border-color:var(--red-light);background:var(--red-light)}
+    .card-act-btn.edit-act{color:var(--blue);border-color:var(--blue-light);background:var(--blue-light)}
 
     /* SEARCH */
-    .search-wrap { position: relative; }
-    .search-wrap input {
-      width: 100%; padding: 13px 16px 13px 46px; font-size: 16px;
-      border: 0.5px solid var(--border2); border-radius: var(--radius-md);
-      background: var(--bg2); color: var(--text); font-family: inherit;
-    }
-    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 20px; color: var(--text3); pointer-events: none; }
+    .search-wrap{position:relative}
+    .search-wrap input{width:100%;padding:13px 16px 13px 46px;font-size:16px;border:.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg2);color:var(--text);font-family:inherit}
+    .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:20px;color:var(--text3);pointer-events:none}
 
     /* FILTER CHIPS */
-    .filter-chips { display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
-    .filter-chips::-webkit-scrollbar { display: none; }
-    .fchip {
-      flex-shrink: 0; padding: 8px 16px; border-radius: 100px; font-size: 13px;
-      font-weight: 500; border: 1px solid var(--border2); background: var(--bg);
-      color: var(--text2); cursor: pointer; transition: all .15s; font-family: inherit;
-    }
-    .fchip.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .filter-chips{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+    .filter-chips::-webkit-scrollbar{display:none}
+    .fchip{flex-shrink:0;padding:8px 16px;border-radius:100px;font-size:13px;font-weight:500;border:1px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s;font-family:inherit}
+    .fchip.on{background:var(--text);color:var(--bg);border-color:var(--text)}
 
     /* CAMPAIGN CARDS */
-    .camp-card {
-      background: var(--bg); border: 0.5px solid var(--border);
-      border-radius: var(--radius-lg); padding: 16px;
-      display: flex; align-items: center; gap: 14px; cursor: pointer;
-    }
-    .camp-card.active-c { border: 2px solid var(--green); }
-    .camp-ico { width: 48px; height: 48px; border-radius: 14px; background: var(--green-light); display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--green-mid); flex-shrink: 0; }
-    .camp-info { flex: 1; min-width: 0; }
-    .camp-name { font-size: 15px; font-weight: 600; color: var(--text); }
-    .camp-meta { font-size: 13px; color: var(--text2); margin-top: 3px; }
-    .camp-bar { height: 4px; background: var(--bg3); border-radius: 2px; margin-top: 8px; }
-    .camp-bar-fill { height: 100%; border-radius: 2px; background: var(--green); }
+    .camp-card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--r-lg);padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer}
+    .camp-card.active-c{border:2px solid var(--green)}
+    .camp-ico{width:48px;height:48px;border-radius:14px;background:var(--green-light);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--green-mid);flex-shrink:0}
+    .camp-info{flex:1;min-width:0}
+    .camp-name{font-size:15px;font-weight:600;color:var(--text)}
+    .camp-meta{font-size:13px;color:var(--text2);margin-top:3px}
+    .camp-bar{height:4px;background:var(--bg3);border-radius:2px;margin-top:8px}
+    .camp-bar-fill{height:100%;border-radius:2px;background:var(--green)}
 
     /* STATS */
-    .stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
-    .stat-box { background: var(--bg2); border-radius: var(--radius-md); padding: 16px; }
-    .stat-lbl { font-size: 13px; color: var(--text2); margin-bottom: 6px; }
-    .stat-val { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; }
-    .stat-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
-    .bar-row { display: flex; align-items: center; gap: 10px; }
-    .bar-lbl { font-size: 13px; color: var(--text2); width: 110px; flex-shrink: 0; }
-    .bar-track { flex: 1; height: 10px; background: var(--bg2); border-radius: 5px; overflow: hidden; }
-    .bar-fill { height: 100%; border-radius: 5px; transition: width .4s; }
-    .bar-n { font-size: 14px; font-weight: 600; color: var(--text); min-width: 24px; text-align: right; }
+    .stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .stat-box{background:var(--bg2);border-radius:var(--r-md);padding:16px}
+    .stat-lbl{font-size:13px;color:var(--text2);margin-bottom:6px}
+    .stat-val{font-size:28px;font-weight:700;color:var(--text);line-height:1}
+    .stat-sub{font-size:12px;color:var(--text2);margin-top:4px}
+    .bar-row{display:flex;align-items:center;gap:10px}
+    .bar-lbl{font-size:13px;color:var(--text2);width:110px;flex-shrink:0}
+    .bar-track{flex:1;height:10px;background:var(--bg2);border-radius:5px;overflow:hidden}
+    .bar-fill{height:100%;border-radius:5px;transition:width .4s}
+    .bar-n{font-size:14px;font-weight:600;color:var(--text);min-width:24px;text-align:right}
 
     /* IMPORT */
-    .upload-zone {
-      border: 2px dashed var(--border2); border-radius: var(--radius-lg);
-      padding: 36px 20px; text-align: center; cursor: pointer; transition: background .15s;
-    }
-    .upload-zone:active { background: var(--bg2); }
-    .uico { font-size: 36px; color: var(--text2); margin-bottom: 10px; }
-    .utitle { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-    .usub { font-size: 13px; color: var(--text2); line-height: 1.6; }
+    .upload-zone{border:2px dashed var(--border2);border-radius:var(--r-lg);padding:36px 20px;text-align:center;cursor:pointer;transition:background .15s}
+    .upload-zone:active{background:var(--bg2)}
+    .uico{font-size:36px;color:var(--text2);margin-bottom:10px}
+    .utitle{font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px}
+    .usub{font-size:13px;color:var(--text2);line-height:1.6}
 
     /* FORMS */
-    .field-grp { display: flex; flex-direction: column; gap: 6px; }
-    .field-lbl { font-size: 13px; font-weight: 500; color: var(--text2); }
-    .field-input {
-      padding: 13px 14px; font-size: 16px;
-      border: 0.5px solid var(--border2); border-radius: var(--radius-md);
-      background: var(--bg2); color: var(--text); width: 100%; font-family: inherit;
-    }
-    .btn-primary { background: var(--green); color: #fff; border: none; border-radius: var(--radius-md); padding: 15px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; font-family: inherit; }
-    .btn-primary:active { opacity: 0.85; }
-    .btn-secondary { background: var(--bg2); color: var(--text); border: 0.5px solid var(--border2); border-radius: var(--radius-md); padding: 15px; font-size: 16px; font-weight: 500; cursor: pointer; width: 100%; font-family: inherit; }
+    .field-grp{display:flex;flex-direction:column;gap:6px}
+    .field-lbl{font-size:13px;font-weight:500;color:var(--text2)}
+    .field-input{padding:13px 14px;font-size:16px;border:.5px solid var(--border2);border-radius:var(--r-md);background:var(--bg2);color:var(--text);width:100%;font-family:inherit}
+    .btn-primary{background:var(--green);color:#fff;border:none;border-radius:var(--r-md);padding:15px;font-size:16px;font-weight:600;cursor:pointer;width:100%;font-family:inherit}
+    .btn-primary:active{opacity:.85}
+    .btn-secondary{background:var(--bg2);color:var(--text);border:.5px solid var(--border2);border-radius:var(--r-md);padding:15px;font-size:16px;font-weight:500;cursor:pointer;width:100%;font-family:inherit}
+    .btn-danger{background:var(--red-light);color:var(--red);border:.5px solid var(--red-light);border-radius:var(--r-md);padding:15px;font-size:16px;font-weight:600;cursor:pointer;width:100%;font-family:inherit}
 
     /* PANEL */
-    .panel { background: var(--bg2); border-radius: var(--radius-lg); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-    .panel-title { font-size: 16px; font-weight: 600; color: var(--text); }
+    .panel{background:var(--bg2);border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;gap:12px}
+    .panel-title{font-size:16px;font-weight:600;color:var(--text)}
 
     /* DAY TOGGLES */
-    .day-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
-    .dtog { padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: var(--bg); color: var(--text2); font-size: 14px; cursor: pointer; text-align: center; font-weight: 500; transition: all .15s; font-family: inherit; }
-    .dtog.on { background: var(--green-light); border-color: var(--green); color: var(--green-mid); }
+    .day-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    .dtog{padding:12px;border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--bg);color:var(--text2);font-size:14px;cursor:pointer;text-align:center;font-weight:500;transition:all .15s;font-family:inherit}
+    .dtog.on{background:var(--green-light);border-color:var(--green);color:var(--green-mid)}
 
     /* PROSPECT SELECT */
-    .pselrow { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 0.5px solid var(--border); }
-    .pselrow:last-child { border-bottom: none; }
-    .chk { width: 24px; height: 24px; border-radius: 6px; border: 1.5px solid var(--border2); background: var(--bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; font-size: 15px; color: transparent; transition: all .15s; }
-    .chk.on { background: var(--green); border-color: var(--green); color: #fff; }
-    .pselname { font-size: 15px; color: var(--text); font-weight: 500; }
-    .pselco { font-size: 13px; color: var(--text2); }
+    .pselrow{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:.5px solid var(--border)}
+    .pselrow:last-child{border-bottom:none}
+    .chk{width:24px;height:24px;border-radius:6px;border:1.5px solid var(--border2);background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;font-size:15px;color:transparent;transition:all .15s}
+    .chk.on{background:var(--green);border-color:var(--green);color:#fff}
+    .pselname{font-size:15px;color:var(--text);font-weight:500}
+    .pselco{font-size:13px;color:var(--text2)}
 
-    /* PREVIEW CARD */
-    .prev-card { background: var(--bg2); border-radius: var(--radius-md); padding: 13px; }
+    /* MODAL OVERLAY */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:flex-end;justify-content:center}
+    .modal-sheet{background:var(--bg);border-radius:20px 20px 0 0;padding:20px 18px 32px;width:100%;max-width:430px;display:flex;flex-direction:column;gap:14px;max-height:90vh;overflow-y:auto}
+    .modal-handle{width:40px;height:4px;border-radius:2px;background:var(--bg3);margin:0 auto 8px}
+    .modal-title{font-size:18px;font-weight:700;color:var(--text)}
+
+    /* FOLLOW UP SECTION */
+    .fu-card{background:var(--bg);border:.5px solid var(--orange);border-radius:var(--r-lg);padding:14px;display:flex;align-items:center;gap:12px}
+    .fu-card .av{background:var(--orange-light)}
+    .fu-info{flex:1;min-width:0}
+    .fu-name{font-size:15px;font-weight:600;color:var(--text)}
+    .fu-co{font-size:13px;color:var(--text2)}
+    .fu-time{font-size:12px;color:var(--orange);margin-top:3px;font-weight:600}
+    .fu-call{width:40px;height:40px;border-radius:50%;background:var(--green);border:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;text-decoration:none;flex-shrink:0}
+    .fu-overdue{background:var(--red-light);border-color:var(--red)}
+    .fu-overdue .fu-time{color:var(--red)}
+
+    /* TRASH */
+    .trash-card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--r-lg);padding:12px;display:flex;align-items:center;gap:12px;opacity:.7}
+    .trash-info{flex:1;min-width:0}
+    .trash-name{font-size:15px;font-weight:600;color:var(--text)}
+    .trash-meta{font-size:12px;color:var(--text2);margin-top:2px}
+    .trash-actions{display:flex;gap:8px}
+    .trash-btn{padding:8px 14px;border-radius:var(--r-md);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;border:.5px solid var(--border2);background:var(--bg2);color:var(--text2)}
+    .trash-btn.restore{color:var(--green);border-color:var(--green-light);background:var(--green-light)}
+
+    /* SEGMENT CONTROL */
+    .seg-ctrl{display:flex;background:var(--bg2);border-radius:var(--r-md);padding:3px;gap:3px}
+    .seg-btn{flex:1;padding:8px;border-radius:var(--r-sm);font-size:13px;font-weight:500;border:none;cursor:pointer;font-family:inherit;background:transparent;color:var(--text2);transition:all .15s}
+    .seg-btn.on{background:var(--bg);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+
+    /* CALLED INDICATOR */
+    .called-check{width:22px;height:22px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;flex-shrink:0}
+
+    /* DUPLICATE TOAST */
+    .dup-toast{background:var(--amber-light);border:1px solid #FAC775;border-radius:var(--r-md);padding:12px 14px;font-size:13px;color:var(--amber)}
+
+    /* PREV CARD */
+    .prev-card{background:var(--bg2);border-radius:var(--r-md);padding:13px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .prev-card.dup{border:1px solid #FAC775;background:var(--amber-light)}
+    .prev-skip{font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;font-family:inherit}
   </style>
 </head>
 <body>
@@ -279,6 +230,11 @@
   <div class="topbar">
     <div class="logo">ColdTrack</div>
     <div class="topbar-icons">
+      <button class="ticon" onclick="switchView('followup')" aria-label="Follow Up" id="fu-icon">
+        <i class="ti ti-bell"></i>
+        <div class="badge-dot hidden" id="fu-dot"></div>
+      </button>
+      <button class="ticon" onclick="switchView('trash')" aria-label="Papelera"><i class="ti ti-trash"></i></button>
       <button class="ticon" onclick="switchView('import')" aria-label="Importar"><i class="ti ti-upload"></i></button>
       <button class="ticon" onclick="switchView('stats')" aria-label="Estadísticas"><i class="ti ti-chart-bar"></i></button>
     </div>
@@ -288,7 +244,9 @@
     <button class="ntab on" id="ntab-today" onclick="switchView('today')">Hoy</button>
     <button class="ntab" id="ntab-prospects" onclick="switchView('prospects')">Prospectos</button>
     <button class="ntab" id="ntab-campaigns" onclick="switchView('campaigns')">Campañas</button>
+    <button class="ntab" id="ntab-followup" onclick="switchView('followup')">Follow Up</button>
     <button class="ntab" id="ntab-import" onclick="switchView('import')">Importar</button>
+    <button class="ntab" id="ntab-trash" onclick="switchView('trash')">Papelera</button>
     <button class="ntab" id="ntab-stats" onclick="switchView('stats')">Stats</button>
   </div>
 
@@ -298,26 +256,18 @@
       <div class="prog-top">
         <div>
           <div class="prog-camp-label">Campaña activa</div>
-          <div class="prog-camp-name" id="camp-active-name">Tech SaaS — Semana 1</div>
+          <div class="prog-camp-name" id="camp-active-name">—</div>
         </div>
-        <div class="prog-counter">
+        <div>
           <div class="prog-big" id="prog-num">0/0</div>
           <div class="prog-small">llamadas hoy</div>
         </div>
       </div>
       <div class="prog-track"><div class="prog-fill" id="prog-bar" style="width:0%"></div></div>
     </div>
-
-    <div class="day-scroll">
-      <button class="daybtn on" onclick="pickDay(this,'Lun 6')">Lun 6</button>
-      <button class="daybtn" onclick="pickDay(this,'Mar 7')">Mar 7</button>
-      <button class="daybtn" onclick="pickDay(this,'Mié 8')">Mié 8</button>
-      <button class="daybtn" onclick="pickDay(this,'Jue 9')">Jue 9</button>
-      <button class="daybtn" onclick="pickDay(this,'Vie 10')">Vie 10</button>
-    </div>
-
+    <div class="day-scroll" id="day-scroll"></div>
     <div class="sec-hdr">
-      <div class="sec-title" id="day-label">Lun 6</div>
+      <div class="sec-title" id="day-label">Hoy</div>
       <button class="sec-link" onclick="switchView('campaigns')">Ver campañas</button>
     </div>
     <div id="today-list" style="display:flex;flex-direction:column;gap:10px"></div>
@@ -334,6 +284,7 @@
       <button class="fchip" onclick="setFilter(this,'pending')">Sin llamar</button>
       <button class="fchip" onclick="setFilter(this,'called')">Llamado</button>
       <button class="fchip" onclick="setFilter(this,'scheduled')">Cita agendada</button>
+      <button class="fchip" onclick="setFilter(this,'followup')">Follow Up</button>
       <button class="fchip" onclick="setFilter(this,'not-interested')">No interesado</button>
     </div>
     <div class="sec-hdr">
@@ -350,7 +301,6 @@
       <button class="sec-link" onclick="toggleNewCamp()">+ Nueva</button>
     </div>
     <div id="camp-list" style="display:flex;flex-direction:column;gap:10px"></div>
-
     <div id="new-camp" class="hidden panel">
       <div class="panel-title">Nueva campaña</div>
       <div class="field-grp">
@@ -369,13 +319,49 @@
         </div>
       </div>
       <div class="field-grp">
-        <div class="field-lbl">Prospectos a incluir</div>
-        <div id="nc-prospects" style="background:var(--bg);border-radius:12px;padding:0 12px"></div>
+        <div class="field-lbl">Selección de prospectos</div>
+        <div class="seg-ctrl" id="camp-seg">
+          <button class="seg-btn on" onclick="setCampSeg(this,'manual')">Manual</button>
+          <button class="seg-btn" onclick="setCampSeg(this,'list')">Por lista CSV</button>
+        </div>
+      </div>
+      <div id="nc-manual-wrap">
+        <div style="background:var(--bg);border-radius:var(--r-md);padding:0 12px;max-height:220px;overflow-y:auto" id="nc-prospects"></div>
+      </div>
+      <div id="nc-list-wrap" class="hidden">
+        <div class="field-grp">
+          <div class="field-lbl">Seleccionar lista CSV importada</div>
+          <select class="field-input" id="nc-list-select" onchange="loadListProspects(this.value)">
+            <option value="">— Elegir lista —</option>
+          </select>
+        </div>
+        <div style="background:var(--bg);border-radius:var(--r-md);padding:0 12px;max-height:220px;overflow-y:auto;margin-top:8px" id="nc-list-prospects"></div>
       </div>
       <div style="display:flex;gap:10px">
         <button class="btn-secondary" style="flex:1" onclick="toggleNewCamp()">Cancelar</button>
-        <button class="btn-primary" style="flex:1" onclick="createCampaign()">Crear</button>
+        <button class="btn-primary" style="flex:1" onclick="createCampaign()">Crear campaña</button>
       </div>
+    </div>
+  </div>
+
+  <!-- FOLLOW UP -->
+  <div class="view hidden" id="v-followup">
+    <div class="sec-hdr">
+      <div class="sec-title">Follow Up</div>
+      <div id="fu-count-lbl" style="font-size:13px;color:var(--text2)"></div>
+    </div>
+    <div id="fu-overdue-section" class="hidden">
+      <div style="font-size:13px;font-weight:600;color:var(--red);margin-bottom:8px">Vencidos</div>
+      <div id="fu-overdue-list" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+    <div id="fu-upcoming-section" class="hidden">
+      <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Próximos</div>
+      <div id="fu-upcoming-list" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+    <div id="fu-empty" style="text-align:center;padding:40px 20px;color:var(--text2)">
+      <div style="font-size:32px;margin-bottom:10px"><i class="ti ti-bell-off"></i></div>
+      <div style="font-size:15px;font-weight:500">Sin follow ups pendientes</div>
+      <div style="font-size:13px;margin-top:4px">Asigná follow ups desde las tarjetas de prospectos</div>
     </div>
   </div>
 
@@ -385,37 +371,38 @@
     <div class="upload-zone" onclick="document.getElementById('file-in').click()">
       <div class="uico"><i class="ti ti-file-spreadsheet"></i></div>
       <div class="utitle">Subir CSV</div>
-      <div class="usub">
-        Columnas: Nombre, Empresa, Teléfono<br>
-        Opcional: Email, Notas
-      </div>
+      <div class="usub">Columnas: Nombre, Empresa, Teléfono<br>Opcional: Email, Notas</div>
     </div>
     <input type="file" id="file-in" style="display:none" accept=".csv" onchange="handleCSV(this)" />
-
-    <div id="preview-block" class="hidden">
-      <div class="sec-hdr" style="margin-bottom:10px">
+    <div id="preview-block" class="hidden" style="display:flex;flex-direction:column;gap:10px">
+      <div id="dup-notice" class="dup-toast hidden"></div>
+      <div class="sec-hdr">
         <div class="sec-title" id="preview-lbl">Vista previa</div>
-        <button class="sec-link" onclick="doImport()">Confirmar importación</button>
+        <button class="sec-link" onclick="doImport()">Confirmar todos</button>
       </div>
       <div id="preview-list" style="display:flex;flex-direction:column;gap:8px"></div>
+      <button class="btn-primary" onclick="doImport()">Importar prospectos seleccionados</button>
     </div>
-
     <div class="panel">
       <div class="panel-title">Agregar manualmente</div>
-      <div class="field-grp">
-        <div class="field-lbl">Nombre</div>
-        <input class="field-input" id="m-name" placeholder="Nombre completo" />
-      </div>
-      <div class="field-grp">
-        <div class="field-lbl">Empresa</div>
-        <input class="field-input" id="m-co" placeholder="Empresa" />
-      </div>
-      <div class="field-grp">
-        <div class="field-lbl">Teléfono</div>
-        <input class="field-input" id="m-ph" placeholder="+34 6XX XXX XXX" type="tel" />
-      </div>
+      <div class="field-grp"><div class="field-lbl">Nombre</div><input class="field-input" id="m-name" placeholder="Nombre completo" /></div>
+      <div class="field-grp"><div class="field-lbl">Empresa</div><input class="field-input" id="m-co" placeholder="Empresa" /></div>
+      <div class="field-grp"><div class="field-lbl">Teléfono</div><input class="field-input" id="m-ph" placeholder="+34 6XX XXX XXX" type="tel" /></div>
       <button class="btn-primary" onclick="addManual()">Agregar prospecto</button>
     </div>
+  </div>
+
+  <!-- PAPELERA -->
+  <div class="view hidden" id="v-trash">
+    <div class="sec-hdr">
+      <div class="sec-title">Papelera</div>
+      <button class="sec-link" id="empty-trash-btn" onclick="emptyTrash()" style="color:var(--red)">Vaciar</button>
+    </div>
+    <div id="trash-empty-msg" style="text-align:center;padding:40px 20px;color:var(--text2)">
+      <div style="font-size:32px;margin-bottom:10px"><i class="ti ti-trash-off"></i></div>
+      <div style="font-size:15px;font-weight:500">La papelera está vacía</div>
+    </div>
+    <div id="trash-list" style="display:flex;flex-direction:column;gap:8px"></div>
   </div>
 
   <!-- STATS -->
@@ -424,7 +411,7 @@
     <div class="stat-grid">
       <div class="stat-box"><div class="stat-lbl">Llamadas hechas</div><div class="stat-val" id="st-total">0</div><div class="stat-sub">en total</div></div>
       <div class="stat-box"><div class="stat-lbl">Citas agendadas</div><div class="stat-val" id="st-sched">0</div><div class="stat-sub" id="st-rate">0% cierre</div></div>
-      <div class="stat-box"><div class="stat-lbl">Sin llamar</div><div class="stat-val" id="st-pend">0</div><div class="stat-sub">en cola</div></div>
+      <div class="stat-box"><div class="stat-lbl">Follow Ups</div><div class="stat-val" id="st-fu">0</div><div class="stat-sub">pendientes</div></div>
       <div class="stat-box"><div class="stat-lbl">Total prospectos</div><div class="stat-val" id="st-all">0</div><div class="stat-sub">cargados</div></div>
     </div>
     <div class="sec-title">Por estado</div>
@@ -433,49 +420,97 @@
     <div id="camp-stats" style="display:flex;flex-direction:column;gap:10px"></div>
   </div>
 
+  <!-- MODAL EDITAR -->
+  <div class="modal-overlay hidden" id="edit-modal" onclick="closeEditModal(event)">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Editar prospecto</div>
+      <div class="field-grp"><div class="field-lbl">Nombre</div><input class="field-input" id="edit-name" /></div>
+      <div class="field-grp"><div class="field-lbl">Empresa</div><input class="field-input" id="edit-co" /></div>
+      <div class="field-grp"><div class="field-lbl">Teléfono</div><input class="field-input" id="edit-ph" type="tel" /></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-secondary" style="flex:1" onclick="closeEditModal()">Cancelar</button>
+        <button class="btn-primary" style="flex:1" onclick="saveEdit()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // ── DATA ──────────────────────────────────────────────────────────────
     const avs = ['av-teal','av-blue','av-amber','av-purple','av-coral'];
     const si = {
-      pending:        { l:'Sin llamar',     c:'b-pend' },
-      called:         { l:'Llamado',        c:'b-calld' },
-      scheduled:      { l:'Cita agendada',  c:'b-sched' },
-      'not-interested':{ l:'No interesado', c:'b-nope' }
+      pending:         {l:'Sin llamar',    c:'b-pend'},
+      called:          {l:'Llamado',       c:'b-calld'},
+      scheduled:       {l:'Cita agendada', c:'b-sched'},
+      'not-interested':{l:'No interesado', c:'b-nope'},
+      followup:        {l:'Follow Up',     c:'b-followup'},
     };
-
     let nid = 9;
     let afilt = 'all';
-    let pending_import = null;
+    let editingId = null;
+    let pendingImport = [];
+    let campSeg = 'manual';
+    let csvLists = [];   // {name, ids:[]}
 
-    // Carga datos guardados o usa demo
-    let prospects = JSON.parse(localStorage.getItem('ct_prospects') || 'null') || [
-      {id:1,name:'Carlos Méndez',co:'Inova Digital',ph:'+34 612 345 678',status:'scheduled',note:'Llamada martes 10am',av:'av-teal',today:true},
-      {id:2,name:'Laura Sánchez',co:'Grupo Nexus',ph:'+34 698 234 567',status:'not-interested',note:'No usa CRM',av:'av-blue',today:true},
-      {id:3,name:'Miguel Torres',co:'FutureTech SL',ph:'+34 655 789 012',status:'pending',note:'',av:'av-amber',today:true},
-      {id:4,name:'Ana Ruiz',co:'Soluciones Óptica',ph:'+34 677 456 789',status:'called',note:'Pedir email',av:'av-purple',today:true},
-      {id:5,name:'Javier López',co:'MediSalud',ph:'+34 633 112 233',status:'pending',note:'',av:'av-coral',today:true},
-      {id:6,name:'Sofía Martín',co:'EduTech Pro',ph:'+34 644 998 877',status:'pending',note:'',av:'av-teal',today:false},
-      {id:7,name:'Pedro Gómez',co:'Retail Innovate',ph:'+34 622 334 455',status:'scheduled',note:'Demo viernes',av:'av-blue',today:false},
-    ];
-
-    let camps = JSON.parse(localStorage.getItem('ct_camps') || 'null') || [
-      {id:1,name:'Tech SaaS — Semana 1',days:['Lunes','Miércoles','Viernes'],pids:[1,2,3,4,5],active:true},
-      {id:2,name:'Salud & Pharma',days:['Martes','Jueves'],pids:[6,7],active:false},
-    ];
+    let prospects = JSON.parse(localStorage.getItem('ct_prospects') || 'null') || [];
+    let camps     = JSON.parse(localStorage.getItem('ct_camps')     || 'null') || [];
+    let trash     = JSON.parse(localStorage.getItem('ct_trash')     || '[]');
 
     function save() {
       localStorage.setItem('ct_prospects', JSON.stringify(prospects));
-      localStorage.setItem('ct_camps', JSON.stringify(camps));
+      localStorage.setItem('ct_camps',     JSON.stringify(camps));
+      localStorage.setItem('ct_trash',     JSON.stringify(trash));
     }
 
     function ini(name) {
-      return name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+      return name.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
     }
 
+    // ── DATE HELPERS ──────────────────────────────────────────────────────
+    const DAYS_ES   = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    const MONTHS_ES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+
+    function buildDayChips() {
+      const scroll = document.getElementById('day-scroll');
+      scroll.innerHTML = '';
+      const today = new Date();
+      // Show Mon–Sun of current week, always including today
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - today.getDay() + 1); // Monday
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(weekStart);
+        d.setDate(weekStart.getDate() + i);
+        const label = DAYS_ES[d.getDay()] + ' ' + d.getDate();
+        const isToday = d.toDateString() === today.toDateString();
+        const btn = document.createElement('button');
+        btn.className = 'daybtn' + (isToday ? ' on today-btn' : '');
+        btn.textContent = label + (isToday ? ' ·hoy' : '');
+        btn.onclick = () => { document.querySelectorAll('.daybtn').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); document.getElementById('day-label').textContent = label; };
+        scroll.appendChild(btn);
+        if (isToday) document.getElementById('day-label').textContent = label;
+      }
+    }
+
+    // ── PROSPECT CARD ─────────────────────────────────────────────────────
     function makeCard(p) {
       const s = si[p.status] || si.pending;
       const d = document.createElement('div');
-      d.className = 'pcard' + (p.status !== 'pending' ? ' done' : '');
+      d.className = 'pcard' + (p.status === 'followup' ? ' followup-pending' : p.status !== 'pending' ? ' done' : '');
       d.id = 'pc-' + p.id;
+
+      const calledBadge = (p.status !== 'pending')
+        ? `<div class="called-check" title="Ya contactado"><i class="ti ti-check"></i></div>` : '';
+
+      const fuSection = p.status !== 'pending' ? `
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div class="field-lbl">Follow Up</div>
+          ${p.followup ? `<div class="fu-badge"><i class="ti ti-bell" style="font-size:13px"></i> ${fmtDatetime(p.followup)}</div><button onclick="clearFollowup(${p.id})" style="font-size:12px;color:var(--red);background:none;border:none;cursor:pointer;font-family:inherit;margin-top:4px">Eliminar recordatorio</button>` : `
+          <div class="followup-row">
+            <input type="datetime-local" id="fu-${p.id}" placeholder="Fecha y hora" />
+            <button class="fu-save-btn" onclick="saveFollowup(${p.id})">+ Recordar</button>
+          </div>`}
+        </div>` : '';
+
       d.innerHTML = `
         <div class="pcard-row">
           <div class="av ${p.av}">${ini(p.name)}</div>
@@ -486,54 +521,126 @@
           </div>
           <div class="pright">
             <span class="bdg ${s.c}" id="bdg-${p.id}">${s.l}</span>
-            <a href="tel:${p.ph.replace(/\s/g,'')}" class="callbtn" aria-label="Llamar a ${p.name}">
-              <i class="ti ti-phone"></i>
-            </a>
+            ${calledBadge}
+            <a href="tel:${p.ph.replace(/\s/g,'')}" class="callbtn" aria-label="Llamar a ${p.name}"><i class="ti ti-phone"></i></a>
           </div>
         </div>
         <div class="pexpand">
-          <textarea placeholder="Agregar nota..." onchange="saveNote(${p.id},this.value)">${p.note}</textarea>
+          <textarea placeholder="Agregar nota..." onchange="saveNote(${p.id},this.value)">${p.note||''}</textarea>
           <select onchange="setStatus(${p.id},this.value)">
             <option value="pending"${p.status==='pending'?' selected':''}>Sin llamar</option>
             <option value="called"${p.status==='called'?' selected':''}>Llamado</option>
             <option value="scheduled"${p.status==='scheduled'?' selected':''}>Cita agendada</option>
+            <option value="followup"${p.status==='followup'?' selected':''}>Follow Up</option>
             <option value="not-interested"${p.status==='not-interested'?' selected':''}>No interesado</option>
           </select>
+          ${fuSection}
+          <div class="card-actions">
+            <button class="card-act-btn edit-act" onclick="openEditModal(${p.id})"><i class="ti ti-edit"></i> Editar</button>
+            <button class="card-act-btn danger" onclick="deleteProspect(${p.id})"><i class="ti ti-trash"></i> Eliminar</button>
+          </div>
         </div>`;
       return d;
+    }
+
+    function fmtDatetime(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      return DAYS_ES[d.getDay()] + ' ' + d.getDate() + ' ' + MONTHS_ES[d.getMonth()] + ', ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
     }
 
     function setStatus(id, val) {
       const p = prospects.find(x=>x.id===id);
       p.status = val;
-      const b = document.getElementById('bdg-'+id);
-      const s = si[val];
-      if (b) { b.className = 'bdg '+s.c; b.textContent = s.l; }
-      const c = document.getElementById('pc-'+id);
-      if (c) c.className = 'pcard' + (val!=='pending' ? ' done' : '');
-      save(); refreshProg();
+      save(); refreshProg(); reRenderCard(id);
+      if (document.getElementById('v-followup') && !document.getElementById('v-followup').classList.contains('hidden')) renderFollowUp();
+      refreshFuDot();
     }
 
-    function saveNote(id, v) {
+    function saveNote(id, v) { const p = prospects.find(x=>x.id===id); if(p){p.note=v;save();} }
+
+    function saveFollowup(id) {
+      const input = document.getElementById('fu-'+id);
+      if (!input || !input.value) return;
       const p = prospects.find(x=>x.id===id);
-      if (p) p.note = v;
-      save();
+      p.followup = input.value;
+      if (p.status === 'pending') { p.status = 'followup'; }
+      save(); reRenderCard(id); refreshFuDot();
     }
 
+    function clearFollowup(id) {
+      const p = prospects.find(x=>x.id===id);
+      p.followup = null;
+      if (p.status === 'followup') p.status = 'called';
+      save(); reRenderCard(id); refreshFuDot();
+    }
+
+    function reRenderCard(id) {
+      const old = document.getElementById('pc-'+id);
+      if (!old) return;
+      const newCard = makeCard(prospects.find(x=>x.id===id));
+      old.replaceWith(newCard);
+    }
+
+    function deleteProspect(id) {
+      const p = prospects.find(x=>x.id===id);
+      if (!p) return;
+      trash.push({...p, deletedAt: new Date().toISOString()});
+      prospects = prospects.filter(x=>x.id!==id);
+      camps.forEach(c=>{ c.pids = c.pids.filter(pid=>pid!==id); });
+      save();
+      const el = document.getElementById('pc-'+id);
+      if (el) el.remove();
+      refreshProg(); refreshFuDot();
+      renderTrash();
+    }
+
+    // ── EDIT MODAL ────────────────────────────────────────────────────────
+    function openEditModal(id) {
+      editingId = id;
+      const p = prospects.find(x=>x.id===id);
+      document.getElementById('edit-name').value = p.name;
+      document.getElementById('edit-co').value   = p.co;
+      document.getElementById('edit-ph').value   = p.ph;
+      document.getElementById('edit-modal').classList.remove('hidden');
+    }
+
+    function closeEditModal(e) {
+      if (e && e.target !== document.getElementById('edit-modal')) return;
+      document.getElementById('edit-modal').classList.add('hidden');
+      editingId = null;
+    }
+
+    function saveEdit() {
+      const p = prospects.find(x=>x.id===editingId);
+      p.name = document.getElementById('edit-name').value.trim() || p.name;
+      p.co   = document.getElementById('edit-co').value.trim();
+      p.ph   = document.getElementById('edit-ph').value.trim() || p.ph;
+      save();
+      document.getElementById('edit-modal').classList.add('hidden');
+      reRenderCard(editingId);
+      editingId = null;
+    }
+
+    // ── PROGRESS ──────────────────────────────────────────────────────────
     function refreshProg() {
       const tp = prospects.filter(x=>x.today);
       const done = tp.filter(x=>x.status!=='pending').length;
-      const pct = Math.round((done / (tp.length || 1)) * 100);
-      document.getElementById('prog-num').textContent = done + '/' + tp.length;
-      document.getElementById('prog-bar').style.width = pct + '%';
+      const pct  = Math.round((done/(tp.length||1))*100);
+      document.getElementById('prog-num').textContent = done+'/'+tp.length;
+      document.getElementById('prog-bar').style.width = pct+'%';
     }
 
+    // ── RENDER TODAY ──────────────────────────────────────────────────────
     function renderToday() {
       const l = document.getElementById('today-list');
       l.innerHTML = '';
-      prospects.filter(p=>p.today).forEach(p=>l.appendChild(makeCard(p)));
+      const list = prospects.filter(p=>p.today);
+      if (!list.length) { l.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2);font-size:14px">Sin prospectos para hoy.<br>Asignalos desde Campañas.</div>'; return; }
+      list.forEach(p=>l.appendChild(makeCard(p)));
     }
 
+    // ── RENDER ALL ────────────────────────────────────────────────────────
     function renderAll(filt, srch) {
       const l = document.getElementById('all-list');
       l.innerHTML = '';
@@ -544,32 +651,71 @@
         p.co.toLowerCase().includes(srch.toLowerCase()) ||
         p.ph.includes(srch)
       );
-      document.getElementById('all-lbl').textContent = r.length + ' prospecto' + (r.length!==1?'s':'');
+      document.getElementById('all-lbl').textContent = r.length + ' prospecto'+(r.length!==1?'s':'');
       r.forEach(p=>l.appendChild(makeCard(p)));
     }
 
     function filterAll(v) { renderAll(afilt, v); }
-
     function setFilter(el, f) {
       document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('on'));
-      el.classList.add('on');
-      afilt = f;
+      el.classList.add('on'); afilt = f;
       renderAll(f, document.getElementById('srch').value);
     }
 
+    // ── FOLLOW UP ─────────────────────────────────────────────────────────
+    function renderFollowUp() {
+      const now = new Date();
+      const all = prospects.filter(p=>p.followup);
+      const overdue  = all.filter(p=>new Date(p.followup) < now).sort((a,b)=>new Date(a.followup)-new Date(b.followup));
+      const upcoming = all.filter(p=>new Date(p.followup) >= now).sort((a,b)=>new Date(a.followup)-new Date(b.followup));
+
+      document.getElementById('fu-empty').classList.toggle('hidden', all.length > 0);
+      document.getElementById('fu-overdue-section').classList.toggle('hidden', overdue.length === 0);
+      document.getElementById('fu-upcoming-section').classList.toggle('hidden', upcoming.length === 0);
+      document.getElementById('fu-count-lbl').textContent = all.length ? all.length + ' recordatorio'+(all.length!==1?'s':'') : '';
+
+      renderFuList('fu-overdue-list',  overdue,  true);
+      renderFuList('fu-upcoming-list', upcoming, false);
+    }
+
+    function renderFuList(elId, list, isOverdue) {
+      const l = document.getElementById(elId);
+      l.innerHTML = '';
+      list.forEach(p => {
+        const d = document.createElement('div');
+        d.className = 'fu-card' + (isOverdue ? ' fu-overdue' : '');
+        d.innerHTML = `
+          <div class="av ${p.av}">${ini(p.name)}</div>
+          <div class="fu-info">
+            <div class="fu-name">${p.name}</div>
+            <div class="fu-co">${p.co}</div>
+            <div class="fu-time"><i class="ti ti-bell" style="font-size:12px"></i> ${fmtDatetime(p.followup)}${isOverdue?' — VENCIDO':''}</div>
+          </div>
+          <a href="tel:${p.ph.replace(/\s/g,'')}" class="fu-call" aria-label="Llamar"><i class="ti ti-phone"></i></a>`;
+        l.appendChild(d);
+      });
+    }
+
+    function refreshFuDot() {
+      const now = new Date();
+      const overdue = prospects.filter(p=>p.followup && new Date(p.followup) < now);
+      document.getElementById('fu-dot').classList.toggle('hidden', overdue.length === 0);
+    }
+
+    // ── CAMPAIGNS ─────────────────────────────────────────────────────────
     function renderCamps() {
       const l = document.getElementById('camp-list');
       l.innerHTML = '';
       camps.forEach(c => {
-        const ps = c.pids.map(id=>prospects.find(p=>p.id===id)).filter(Boolean);
+        const ps   = c.pids.map(id=>prospects.find(p=>p.id===id)).filter(Boolean);
         const done = ps.filter(p=>p.status!=='pending').length;
-        const pct = Math.round((done / (ps.length || 1)) * 100);
+        const pct  = Math.round((done/(ps.length||1))*100);
         const d = document.createElement('div');
         d.className = 'camp-card' + (c.active ? ' active-c' : '');
         d.innerHTML = `
           <div class="camp-ico"><i class="ti ti-speakerphone"></i></div>
           <div class="camp-info">
-            <div class="camp-name">${c.name}${c.active ? ' <span class="bdg b-sched" style="font-size:11px">Activa</span>' : ''}</div>
+            <div class="camp-name">${c.name}${c.active?' <span class="bdg b-sched" style="font-size:11px">Activa</span>':''}</div>
             <div class="camp-meta">${ps.length} prospectos · ${done} llamados · ${c.days.slice(0,2).join(', ')}</div>
             <div class="camp-bar"><div class="camp-bar-fill" style="width:${pct}%"></div></div>
           </div>
@@ -580,39 +726,98 @@
     }
 
     function setActiveCamp(id) {
-      camps.forEach(c=>c.active = c.id===id);
+      camps.forEach(c=>c.active=(c.id===id));
       const c = camps.find(x=>x.id===id);
       document.getElementById('camp-active-name').textContent = c.name;
-      save(); renderCamps();
+      prospects.forEach(p=>{ p.today = c.pids.includes(p.id); });
+      save(); renderCamps(); renderToday(); refreshProg();
     }
 
     function toggleNewCamp() {
-      const p = document.getElementById('new-camp');
-      const hidden = p.classList.toggle('hidden');
+      const panel = document.getElementById('new-camp');
+      const hidden = panel.classList.toggle('hidden');
       if (!hidden) {
-        const pl = document.getElementById('nc-prospects');
-        pl.innerHTML = '';
-        prospects.forEach(p => {
-          const r = document.createElement('div');
-          r.className = 'pselrow';
-          r.innerHTML = `
-            <div class="chk" id="ncp-${p.id}" onclick="this.classList.toggle('on');this.innerHTML=this.classList.contains('on')?'<i class=\\'ti ti-check\\'></i>':''"></div>
-            <div><div class="pselname">${p.name}</div><div class="pselco">${p.co}</div></div>`;
-          pl.appendChild(r);
-        });
+        populateManualList();
+        populateCsvListSelect();
+        setCampSeg(document.querySelector('#camp-seg .seg-btn.on'), 'manual');
       }
+    }
+
+    function setCampSeg(el, seg) {
+      campSeg = seg;
+      document.querySelectorAll('#camp-seg .seg-btn').forEach(b=>b.classList.remove('on'));
+      el.classList.add('on');
+      document.getElementById('nc-manual-wrap').classList.toggle('hidden', seg !== 'manual');
+      document.getElementById('nc-list-wrap').classList.toggle('hidden', seg !== 'list');
+    }
+
+    function populateManualList() {
+      const pl = document.getElementById('nc-prospects');
+      pl.innerHTML = '';
+      prospects.forEach(p => {
+        const r = document.createElement('div');
+        r.className = 'pselrow';
+        r.innerHTML = `
+          <div class="chk" id="ncp-${p.id}" onclick="this.classList.toggle('on');this.innerHTML=this.classList.contains('on')?'<i class=\\'ti ti-check\\'></i>':''"></div>
+          <div><div class="pselname">${p.name}</div><div class="pselco">${p.co}</div></div>`;
+        pl.appendChild(r);
+      });
+    }
+
+    function populateCsvListSelect() {
+      const sel = document.getElementById('nc-list-select');
+      sel.innerHTML = '<option value="">— Elegir lista —</option>';
+      csvLists.forEach((list, i) => {
+        const o = document.createElement('option');
+        o.value = i; o.textContent = list.name + ' (' + list.ids.length + ' contactos)';
+        sel.appendChild(o);
+      });
+    }
+
+    function loadListProspects(idx) {
+      const pl = document.getElementById('nc-list-prospects');
+      pl.innerHTML = '';
+      if (idx === '') return;
+      const list = csvLists[parseInt(idx)];
+      if (!list) return;
+      list.ids.forEach(id => {
+        const p = prospects.find(x=>x.id===id);
+        if (!p) return;
+        const r = document.createElement('div');
+        r.className = 'pselrow';
+        r.innerHTML = `
+          <div class="chk on" id="ncpl-${p.id}" onclick="this.classList.toggle('on');this.innerHTML=this.classList.contains('on')?'<i class=\\'ti ti-check\\'></i>':''"><i class="ti ti-check"></i></div>
+          <div><div class="pselname">${p.name}</div><div class="pselco">${p.co}</div></div>`;
+        pl.appendChild(r);
+      });
     }
 
     function createCampaign() {
       const name = document.getElementById('nc-name').value.trim();
       if (!name) { alert('Ingresá un nombre para la campaña'); return; }
       const days = [...document.querySelectorAll('#new-camp .dtog.on')].map(el=>el.textContent);
-      const pids = prospects.filter(p=>document.getElementById('ncp-'+p.id)?.classList.contains('on')).map(p=>p.id);
-      camps.push({ id: Date.now(), name, days, pids, active: false });
+      let pids = [];
+      if (campSeg === 'manual') {
+        pids = prospects.filter(p=>document.getElementById('ncp-'+p.id)?.classList.contains('on')).map(p=>p.id);
+      } else {
+        const listIdx = document.getElementById('nc-list-select').value;
+        if (listIdx !== '') {
+          const list = csvLists[parseInt(listIdx)];
+          pids = list.ids.filter(id => document.getElementById('ncpl-'+id)?.classList.contains('on'));
+        }
+      }
+      camps.push({id:Date.now(), name, days, pids, active:false});
       document.getElementById('nc-name').value = '';
       document.querySelectorAll('#new-camp .dtog').forEach(el=>el.classList.remove('on'));
       toggleNewCamp();
       save(); renderCamps();
+    }
+
+    // ── CSV IMPORT ────────────────────────────────────────────────────────
+    function isDuplicate(name, ph) {
+      const n = name.toLowerCase().trim();
+      const p = ph.replace(/\s/g,'');
+      return prospects.some(x => x.name.toLowerCase().trim() === n || x.ph.replace(/\s/g,'') === p);
     }
 
     function handleCSV(input) {
@@ -627,125 +832,180 @@
           if (cols[0] && cols[2]) {
             parsed.push({
               id: nid++, name: cols[0], co: cols[1]||'', ph: cols[2]||'',
-              status: 'pending', note: cols[4]||'', today: false,
-              av: avs[nid % avs.length]
+              status:'pending', note:cols[4]||'', today:false,
+              av: avs[nid % avs.length],
+              isDup: isDuplicate(cols[0], cols[2]),
+              skip: false
             });
           }
         });
-        pending_import = parsed;
-        const pb = document.getElementById('preview-block');
-        pb.classList.remove('hidden');
-        document.getElementById('preview-lbl').textContent = parsed.length + ' prospectos detectados';
-        const pl = document.getElementById('preview-list');
-        pl.innerHTML = '';
-        parsed.slice(0, 5).forEach(p => {
-          const d = document.createElement('div');
-          d.className = 'prev-card';
-          d.innerHTML = `<div style="font-size:15px;font-weight:600;color:var(--text)">${p.name}</div>
-            <div style="font-size:13px;color:var(--text2);margin-top:3px">${p.co} · ${p.ph}</div>`;
-          pl.appendChild(d);
-        });
-        if (parsed.length > 5) {
-          const m = document.createElement('div');
-          m.style.cssText = 'text-align:center;font-size:13px;color:var(--text2);padding:8px';
-          m.textContent = '... y ' + (parsed.length - 5) + ' más';
-          pl.appendChild(m);
+        pendingImport = parsed;
+        const dupCount = parsed.filter(p=>p.isDup).length;
+        const notice = document.getElementById('dup-notice');
+        if (dupCount > 0) {
+          notice.classList.remove('hidden');
+          notice.textContent = `⚠️ Se detectaron ${dupCount} contacto${dupCount!==1?'s':''} duplicado${dupCount!==1?'s':''}. Aparecen marcados en amarillo — podés saltearlos.`;
+        } else {
+          notice.classList.add('hidden');
         }
+        document.getElementById('preview-block').classList.remove('hidden');
+        document.getElementById('preview-lbl').textContent = parsed.length + ' prospectos detectados';
+        renderPreviewList();
       };
       reader.readAsText(file);
     }
 
+    function renderPreviewList() {
+      const pl = document.getElementById('preview-list');
+      pl.innerHTML = '';
+      pendingImport.forEach((p, i) => {
+        const d = document.createElement('div');
+        d.className = 'prev-card' + (p.isDup ? ' dup' : '');
+        d.id = 'prev-'+i;
+        d.innerHTML = `
+          <div>
+            <div style="font-size:15px;font-weight:600;color:var(--text)">${p.name}${p.isDup?' <span style="font-size:11px;color:var(--amber)">Duplicado</span>':''}</div>
+            <div style="font-size:13px;color:var(--text2);margin-top:3px">${p.co} · ${p.ph}</div>
+          </div>
+          ${p.isDup && !p.skip ? `<button class="prev-skip" onclick="skipDup(${i})">Saltar</button>` : p.skip ? `<span style="font-size:12px;color:var(--text3)">Saltado</span>` : ''}`;
+        pl.appendChild(d);
+      });
+    }
+
+    function skipDup(i) {
+      pendingImport[i].skip = true;
+      renderPreviewList();
+    }
+
     function doImport() {
-      if (!pending_import) return;
-      prospects.push(...pending_import);
-      pending_import = null;
+      const toImport = pendingImport.filter(p=>!p.skip);
+      const listName = 'Lista ' + new Date().toLocaleDateString('es-ES',{day:'numeric',month:'short'});
+      const newIds = [];
+      toImport.forEach(p => {
+        const {isDup, skip, ...clean} = p;
+        prospects.push(clean);
+        newIds.push(clean.id);
+      });
+      if (newIds.length > 0) csvLists.push({name: listName, ids: newIds});
+      pendingImport = [];
       document.getElementById('preview-block').classList.add('hidden');
       document.getElementById('file-in').value = '';
       save(); renderToday(); refreshProg();
-      alert('✓ Importación completada. ' + prospects.length + ' prospectos en total.');
+      alert('✓ ' + toImport.length + ' prospectos importados como "' + listName + '".');
     }
 
     function addManual() {
-      const n = document.getElementById('m-name').value.trim();
-      const c = document.getElementById('m-co').value.trim();
+      const n  = document.getElementById('m-name').value.trim();
+      const c  = document.getElementById('m-co').value.trim();
       const ph = document.getElementById('m-ph').value.trim();
       if (!n || !ph) { alert('Nombre y teléfono son obligatorios'); return; }
-      prospects.push({ id: nid++, name: n, co: c, ph, status: 'pending', note: '', today: false, av: avs[nid % avs.length] });
+      if (isDuplicate(n, ph)) {
+        if (!confirm('Este contacto parece duplicado. ¿Lo agregás igual?')) return;
+      }
+      prospects.push({id:nid++, name:n, co:c, ph, status:'pending', note:'', today:false, av:avs[nid%avs.length]});
       document.getElementById('m-name').value = '';
-      document.getElementById('m-co').value = '';
-      document.getElementById('m-ph').value = '';
-      save(); alert('✓ ' + n + ' agregado correctamente.');
+      document.getElementById('m-co').value   = '';
+      document.getElementById('m-ph').value   = '';
+      save(); alert('✓ '+n+' agregado correctamente.');
     }
 
+    // ── TRASH ─────────────────────────────────────────────────────────────
+    function renderTrash() {
+      const l = document.getElementById('trash-list');
+      l.innerHTML = '';
+      document.getElementById('trash-empty-msg').classList.toggle('hidden', trash.length > 0);
+      document.getElementById('empty-trash-btn').classList.toggle('hidden', trash.length === 0);
+      [...trash].reverse().forEach((p, ri) => {
+        const realIdx = trash.length - 1 - ri;
+        const d = document.createElement('div');
+        d.className = 'trash-card';
+        d.innerHTML = `
+          <div class="av ${p.av}" style="width:38px;height:38px;font-size:13px">${ini(p.name)}</div>
+          <div class="trash-info">
+            <div class="trash-name">${p.name}</div>
+            <div class="trash-meta">${p.co} · Eliminado ${new Date(p.deletedAt).toLocaleDateString('es-ES')}</div>
+          </div>
+          <div class="trash-actions">
+            <button class="trash-btn restore" onclick="restoreTrash(${realIdx})"><i class="ti ti-refresh"></i> Restaurar</button>
+          </div>`;
+        l.appendChild(d);
+      });
+    }
+
+    function restoreTrash(idx) {
+      const p = trash.splice(idx, 1)[0];
+      const {deletedAt, ...clean} = p;
+      prospects.push(clean);
+      save(); renderTrash(); refreshProg();
+    }
+
+    function emptyTrash() {
+      if (!confirm('¿Vaciar la papelera? Esta acción no se puede deshacer.')) return;
+      trash = []; save(); renderTrash();
+    }
+
+    // ── STATS ─────────────────────────────────────────────────────────────
     function renderStats() {
-      const total = prospects.filter(p=>p.status!=='pending').length;
-      const sched = prospects.filter(p=>p.status==='scheduled').length;
-      const pend  = prospects.filter(p=>p.status==='pending').length;
-      const called= prospects.filter(p=>p.status==='called').length;
-      const nope  = prospects.filter(p=>p.status==='not-interested').length;
-      const rate  = total > 0 ? Math.round((sched/total)*100) : 0;
+      const total  = prospects.filter(p=>p.status!=='pending').length;
+      const sched  = prospects.filter(p=>p.status==='scheduled').length;
+      const fu     = prospects.filter(p=>p.followup).length;
+      const pend   = prospects.filter(p=>p.status==='pending').length;
+      const called = prospects.filter(p=>p.status==='called').length;
+      const nope   = prospects.filter(p=>p.status==='not-interested').length;
+      const rate   = total>0 ? Math.round((sched/total)*100) : 0;
       document.getElementById('st-total').textContent = total;
       document.getElementById('st-sched').textContent = sched;
-      document.getElementById('st-rate').textContent  = rate + '% cierre';
-      document.getElementById('st-pend').textContent  = pend;
+      document.getElementById('st-rate').textContent  = rate+'% cierre';
+      document.getElementById('st-fu').textContent    = fu;
       document.getElementById('st-all').textContent   = prospects.length;
-
       const bars = document.getElementById('stat-bars');
       bars.innerHTML = '';
-      const max = Math.max(sched, called, nope, pend, 1);
-      [
-        {l:'Cita agendada', v:sched,  col:'#1D9E75'},
-        {l:'Llamado',       v:called, col:'#378ADD'},
-        {l:'No interesado', v:nope,   col:'#E24B4A'},
-        {l:'Sin llamar',    v:pend,   col:'#888780'},
-      ].forEach(item => {
-        const r = document.createElement('div');
-        r.className = 'bar-row';
-        r.innerHTML = `<div class="bar-lbl">${item.l}</div>
-          <div class="bar-track"><div class="bar-fill" style="width:${Math.round((item.v/max)*100)}%;background:${item.col}"></div></div>
-          <div class="bar-n">${item.v}</div>`;
+      const max = Math.max(sched,called,fu,nope,pend,1);
+      [{l:'Cita agendada',v:sched,col:'#1D9E75'},{l:'Llamado',v:called,col:'#378ADD'},{l:'Follow Up',v:fu,col:'#BA7517'},{l:'No interesado',v:nope,col:'#E24B4A'},{l:'Sin llamar',v:pend,col:'#888780'}]
+      .forEach(item=>{
+        const r = document.createElement('div'); r.className='bar-row';
+        r.innerHTML=`<div class="bar-lbl">${item.l}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round((item.v/max)*100)}%;background:${item.col}"></div></div><div class="bar-n">${item.v}</div>`;
         bars.appendChild(r);
       });
-
       const cs = document.getElementById('camp-stats');
       cs.innerHTML = '';
       camps.forEach(c => {
         const ps = c.pids.map(id=>prospects.find(p=>p.id===id)).filter(Boolean);
-        const d = ps.filter(p=>p.status!=='pending').length;
-        const pct = Math.round((d / (ps.length || 1)) * 100);
-        const div = document.createElement('div');
-        div.style.cssText = 'background:var(--bg2);border-radius:14px;padding:14px';
-        div.innerHTML = `
-          <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-            <div style="font-size:15px;font-weight:600;color:var(--text)">${c.name}</div>
-            <div style="font-size:14px;font-weight:600;color:var(--text2)">${pct}%</div>
-          </div>
-          <div class="camp-bar"><div class="camp-bar-fill" style="width:${pct}%"></div></div>
-          <div style="font-size:13px;color:var(--text2);margin-top:6px">${d} de ${ps.length} llamados</div>`;
+        const d  = ps.filter(p=>p.status!=='pending').length;
+        const pct= Math.round((d/(ps.length||1))*100);
+        const div= document.createElement('div');
+        div.style.cssText='background:var(--bg2);border-radius:14px;padding:14px';
+        div.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:8px"><div style="font-size:15px;font-weight:600;color:var(--text)">${c.name}</div><div style="font-size:14px;font-weight:600;color:var(--text2)">${pct}%</div></div><div class="camp-bar"><div class="camp-bar-fill" style="width:${pct}%"></div></div><div style="font-size:13px;color:var(--text2);margin-top:6px">${d} de ${ps.length} llamados</div>`;
         cs.appendChild(div);
       });
     }
 
-    function pickDay(el, day) {
-      document.querySelectorAll('.daybtn').forEach(b=>b.classList.remove('on'));
-      el.classList.add('on');
-      document.getElementById('day-label').textContent = day;
-    }
-
+    // ── NAVIGATION ────────────────────────────────────────────────────────
     function switchView(name) {
-      ['today','prospects','campaigns','import','stats'].forEach(v => {
-        document.getElementById('v-'+v).classList.toggle('hidden', v!==name);
+      const views = ['today','prospects','campaigns','followup','import','trash','stats'];
+      views.forEach(v=>{
+        document.getElementById('v-'+v).classList.toggle('hidden',v!==name);
         const t = document.getElementById('ntab-'+v);
-        if (t) t.classList.toggle('on', v===name);
+        if(t) t.classList.toggle('on',v===name);
       });
-      if (name==='prospects') renderAll(afilt, '');
-      if (name==='campaigns') renderCamps();
-      if (name==='stats') renderStats();
+      if(name==='prospects') renderAll(afilt,'');
+      if(name==='campaigns') renderCamps();
+      if(name==='followup')  renderFollowUp();
+      if(name==='trash')     renderTrash();
+      if(name==='stats')     renderStats();
     }
 
-    // Init
+    // ── INIT ──────────────────────────────────────────────────────────────
+    buildDayChips();
     renderToday();
     refreshProg();
+    refreshFuDot();
+
+    const activeCamp = camps.find(c=>c.active);
+    if (activeCamp) document.getElementById('camp-active-name').textContent = activeCamp.name;
+
+    // Follow-up reminder check every minute
+    setInterval(refreshFuDot, 60000);
   </script>
 </body>
 </html>
