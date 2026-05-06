@@ -387,10 +387,19 @@
 
   function save(){if(!appReady)return;setSyncStatus('syncing');remoteWriting=true;REF.set({prospects,camps,trash,csvLists:csvLists||[]},err=>{setSyncStatus(err?'off':'ok');setTimeout(()=>{remoteWriting=false;},500);});}
 
+  // Firebase sometimes stores arrays as objects when keys are large numbers — normalize back
+  function toArray(val){if(!val)return[];if(Array.isArray(val))return val;return Object.values(val);}
+
   REF.on('value',snap=>{
     if(remoteWriting)return;
     const data=snap.val();
-    if(data){prospects=data.prospects||[];camps=data.camps||[];trash=data.trash||[];csvLists=data.csvLists||[];nid=Math.max(nid,...prospects.map(p=>p.id||0),Date.now());}
+    if(data){
+      prospects=toArray(data.prospects);
+      camps=toArray(data.camps);
+      trash=toArray(data.trash);
+      csvLists=toArray(data.csvLists);
+      nid=Math.max(nid,...prospects.map(p=>p.id||0),Date.now());
+    }
     if(!appReady){appReady=true;document.getElementById('loading-screen').style.display='none';document.getElementById('app-root').classList.remove('hidden');document.getElementById('app-root').style.display='flex';initToday();refreshCurrentPanel();}
     else{refreshCurrentPanel();}
     refreshSidebarStats();refreshFuBadge();setSyncStatus('ok');
@@ -463,7 +472,7 @@
   function filterDesk(v){deskSearch=v;renderAll();}
   function setDeskFilter(el,f){document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('on'));el.classList.add('on');deskFilter=f;renderAll();}
 
-  function setStatus(id,val){const p=prospects.find(x=>x.id===id);p.status=val;save();refreshCurrentPanel();refreshSidebarStats();}
+  function setStatus(id,val){const p=prospects.find(x=>x.id===id);p.status=val;if(val==='pending'){p.followup=null;}save();refreshCurrentPanel();refreshSidebarStats();refreshFuBadge();}
 
   // ── FOLLOW UP MODAL ───────────────────────────────────────────────────
   let fuEditingId=null;
