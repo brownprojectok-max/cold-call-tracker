@@ -342,16 +342,57 @@
   </div>
 </div>
 
-<!-- ADD/EDIT MODAL -->
+<!-- PROSPECT MODAL -->
 <div class="modal-overlay hidden" id="edit-modal" onclick="closeModal(event)">
-  <div class="modal-box">
+  <div class="modal-box" style="max-width:520px">
     <div class="modal-title" id="modal-title">Nuevo prospecto</div>
-    <div class="field-grp"><div class="field-lbl">Nombre</div><input class="field-input" id="edit-name" placeholder="Nombre completo" /></div>
-    <div class="field-grp"><div class="field-lbl">Empresa</div><input class="field-input" id="edit-co" placeholder="Empresa" /></div>
-    <div class="field-grp"><div class="field-lbl">Teléfono</div><input class="field-input" id="edit-ph" placeholder="+34 6XX XXX XXX" type="tel" /></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="field-grp"><div class="field-lbl">Nombre</div><input class="field-input" id="edit-name" placeholder="Nombre completo" /></div>
+      <div class="field-grp"><div class="field-lbl">Empresa</div><input class="field-input" id="edit-co" placeholder="Empresa" /></div>
+      <div class="field-grp"><div class="field-lbl">Teléfono</div><input class="field-input" id="edit-ph" placeholder="+34 6XX XXX XXX" type="tel" /></div>
+      <div class="field-grp"><div class="field-lbl">Email</div><input class="field-input" id="edit-email" placeholder="email@empresa.com" type="email" /></div>
+    </div>
+    <div class="field-grp" id="edit-status-grp">
+      <div class="field-lbl">Estado</div>
+      <select class="field-input" id="edit-status">
+        <option value="pending">Sin llamar</option>
+        <option value="called">Llamado</option>
+        <option value="scheduled">Cita agendada</option>
+        <option value="followup">Follow Up</option>
+        <option value="not-interested">No interesado</option>
+      </select>
+    </div>
+    <div class="field-grp"><div class="field-lbl">Nota</div><textarea class="field-input" id="edit-note" style="height:80px;resize:none" placeholder="Notas sobre este prospecto..."></textarea></div>
     <div class="form-actions">
       <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn-primary" onclick="saveModal()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CAMPAIGN EDIT MODAL -->
+<div class="modal-overlay hidden" id="edit-camp-modal" onclick="closeEditCampModal(event)">
+  <div class="modal-box" style="max-width:600px;max-height:90vh;overflow-y:auto">
+    <div class="modal-title">Editar campaña</div>
+    <div class="field-grp"><div class="field-lbl">Nombre de la campaña</div><input class="field-input" id="ec-name" placeholder="Nombre" /></div>
+    <div class="field-grp">
+      <div class="field-lbl">Días activos</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap" id="ec-days">
+        <button class="dtog" onclick="this.classList.toggle('on')">Lunes</button>
+        <button class="dtog" onclick="this.classList.toggle('on')">Martes</button>
+        <button class="dtog" onclick="this.classList.toggle('on')">Miércoles</button>
+        <button class="dtog" onclick="this.classList.toggle('on')">Jueves</button>
+        <button class="dtog" onclick="this.classList.toggle('on')">Viernes</button>
+        <button class="dtog" onclick="this.classList.toggle('on')">Sábado</button>
+      </div>
+    </div>
+    <div class="field-grp">
+      <div class="field-lbl">Prospectos incluidos</div>
+      <div class="psel-list" id="ec-prospects"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-secondary" onclick="closeEditCampModal()">Cancelar</button>
+      <button class="btn-primary" onclick="saveEditCamp()">Guardar campaña</button>
     </div>
   </div>
 </div>
@@ -529,7 +570,7 @@
       const ps=c.pids.map(id=>prospects.find(p=>p.id===id)).filter(Boolean);
       const done=ps.filter(p=>p.status!=='pending').length;const pct=Math.round((done/(ps.length||1))*100);
       const card=document.createElement('div');card.className='camp-card'+(c.active?' active-c':'');
-      card.innerHTML=`<div class="camp-card-top"><div class="camp-ico"><i class="ti ti-speakerphone"></i></div><div class="camp-info"><div class="camp-name">${c.name}${c.active?' <span class="bdg b-sched" style="font-size:10px;margin-left:4px">Activa</span>':''}</div><div class="camp-meta">${ps.length} prospectos · ${done} llamados · ${c.days.slice(0,3).join(', ')}</div></div></div><div class="camp-bar"><div class="camp-bar-fill" style="width:${pct}%"></div></div><div style="font-size:12px;color:var(--text2)">${pct}% completado</div><div class="camp-actions"><button class="camp-btn activate ${c.active?'active':''}" onclick="setActiveCamp('${c.id}')"><i class="ti ti-${c.active?'check':'player-play'}"></i> ${c.active?'Activa':'Activar'}</button><button class="camp-btn" onclick="renameCamp('${c.id}')"><i class="ti ti-edit"></i> Renombrar</button><button class="camp-btn danger" onclick="deleteCamp('${c.id}')"><i class="ti ti-trash"></i> Eliminar</button></div>`;
+      card.innerHTML=`<div class="camp-card-top"><div class="camp-ico"><i class="ti ti-speakerphone"></i></div><div class="camp-info"><div class="camp-name">${c.name}${c.active?' <span class="bdg b-sched" style="font-size:10px;margin-left:4px">Activa</span>':''}</div><div class="camp-meta">${ps.length} prospectos · ${done} llamados · ${c.days.slice(0,3).join(', ')}</div></div></div><div class="camp-bar"><div class="camp-bar-fill" style="width:${pct}%"></div></div><div style="font-size:12px;color:var(--text2)">${pct}% completado</div><div class="camp-actions"><button class="camp-btn activate ${c.active?'active':''}" onclick="setActiveCamp('${c.id}')"><i class="ti ti-${c.active?'check':'player-play'}"></i> ${c.active?'Activa':'Activar'}</button><button class="camp-btn" onclick="openEditCampModal('${c.id}')"><i class="ti ti-edit"></i> Editar</button><button class="camp-btn danger" onclick="deleteCamp('${c.id}')"><i class="ti ti-trash"></i> Eliminar</button></div>`;
       grid.appendChild(card);
     });
     if(!camps.length)grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-speakerphone" style="font-size:40px;margin-bottom:12px;display:block"></i>Sin campañas. Creá una nueva.</div>';
@@ -559,11 +600,88 @@
 
   function refreshSidebarStats(){document.getElementById('sb-total').textContent=prospects.length;document.getElementById('sb-called').textContent=prospects.filter(p=>p.status!=='pending').length;document.getElementById('sb-sched').textContent=prospects.filter(p=>p.status==='scheduled').length;}
 
-  // ── ADD/EDIT MODAL ────────────────────────────────────────────────────
-  function openAddModal(){isNewProspect=true;editingId=null;document.getElementById('modal-title').textContent='Nuevo prospecto';document.getElementById('edit-name').value='';document.getElementById('edit-co').value='';document.getElementById('edit-ph').value='';document.getElementById('edit-modal').classList.remove('hidden');}
-  function openEditModal(id){isNewProspect=false;editingId=id;const p=prospects.find(x=>x.id===id);document.getElementById('modal-title').textContent='Editar prospecto';document.getElementById('edit-name').value=p.name;document.getElementById('edit-co').value=p.co;document.getElementById('edit-ph').value=p.ph;document.getElementById('edit-modal').classList.remove('hidden');}
+  // ── PROSPECT MODAL ────────────────────────────────────────────────────
+  function openAddModal(){
+    isNewProspect=true;editingId=null;
+    document.getElementById('modal-title').textContent='Nuevo prospecto';
+    document.getElementById('edit-name').value='';
+    document.getElementById('edit-co').value='';
+    document.getElementById('edit-ph').value='';
+    document.getElementById('edit-email').value='';
+    document.getElementById('edit-status').value='pending';
+    document.getElementById('edit-note').value='';
+    document.getElementById('edit-status-grp').classList.add('hidden');
+    document.getElementById('edit-modal').classList.remove('hidden');
+  }
+  function openEditModal(id){
+    isNewProspect=false;editingId=id;
+    const p=prospects.find(x=>x.id===id);
+    document.getElementById('modal-title').textContent='Editar prospecto';
+    document.getElementById('edit-name').value=p.name||'';
+    document.getElementById('edit-co').value=p.co||'';
+    document.getElementById('edit-ph').value=p.ph||'';
+    document.getElementById('edit-email').value=p.email||'';
+    document.getElementById('edit-status').value=p.status||'pending';
+    document.getElementById('edit-note').value=p.note||'';
+    document.getElementById('edit-status-grp').classList.remove('hidden');
+    document.getElementById('edit-modal').classList.remove('hidden');
+  }
   function closeModal(e){if(e&&e.target!==document.getElementById('edit-modal'))return;document.getElementById('edit-modal').classList.add('hidden');}
-  function saveModal(){const n=document.getElementById('edit-name').value.trim();const c=document.getElementById('edit-co').value.trim();const ph=document.getElementById('edit-ph').value.trim();if(!n||!ph){alert('Nombre y teléfono son obligatorios');return;}if(isNewProspect){if(isDuplicate(n,ph)&&!confirm('Parece duplicado. ¿Agregás igual?'))return;prospects.push({id:uid(),name:n,co:c,ph,status:'pending',note:'',today:false,av:avs[prospects.length%avs.length]});}else{const p=prospects.find(x=>x.id===editingId);p.name=n;p.co=c;p.ph=ph;}save();document.getElementById('edit-modal').classList.add('hidden');refreshCurrentPanel();refreshSidebarStats();}
+  function saveModal(){
+    const n=document.getElementById('edit-name').value.trim();
+    const c=document.getElementById('edit-co').value.trim();
+    const ph=document.getElementById('edit-ph').value.trim();
+    const email=document.getElementById('edit-email').value.trim();
+    const status=document.getElementById('edit-status').value;
+    const note=document.getElementById('edit-note').value.trim();
+    if(!n||!ph){alert('Nombre y teléfono son obligatorios');return;}
+    if(isNewProspect){
+      if(isDuplicate(n,ph)&&!confirm('Parece duplicado. ¿Agregás igual?'))return;
+      prospects.push({id:uid(),name:n,co:c,ph,email,status:'pending',note,today:false,av:avs[prospects.length%avs.length]});
+    } else {
+      const p=prospects.find(x=>x.id===editingId);
+      p.name=n;p.co=c;p.ph=ph;p.email=email;p.status=status;p.note=note;
+      if(status==='pending')p.followup=null;
+    }
+    save();document.getElementById('edit-modal').classList.add('hidden');refreshCurrentPanel();refreshSidebarStats();
+  }
+
+  // ── CAMPAIGN EDIT MODAL ───────────────────────────────────────────────
+  let editingCampId=null;
+  function openEditCampModal(id){
+    editingCampId=id;
+    const c=camps.find(x=>x.id===id);
+    document.getElementById('ec-name').value=c.name||'';
+    // Days
+    document.querySelectorAll('#ec-days .dtog').forEach(btn=>{
+      btn.classList.toggle('on', c.days.includes(btn.textContent));
+    });
+    // Prospects
+    const pl=document.getElementById('ec-prospects');
+    pl.innerHTML='';
+    prospects.forEach(p=>{
+      const inCamp=c.pids.includes(String(p.id));
+      const r=document.createElement('div');
+      r.className='pselrow';
+      r.style.cursor='pointer';
+      r.innerHTML=`<div class="chk${inCamp?' on':''}" id="ecp-${p.id}" onclick="this.classList.toggle('on');this.innerHTML=this.classList.contains('on')?'<i class=\\'ti ti-check\\'></i>':''"> ${inCamp?'<i class="ti ti-check"></i>':''}</div><div><div style="font-size:13px;font-weight:500;color:var(--text)">${p.name}</div><div style="font-size:12px;color:var(--text2)">${p.co}</div></div>`;
+      r.onclick=(e)=>{ if(e.target.classList.contains('chk')||e.target.closest('.chk'))return; const cb=document.getElementById('ecp-'+p.id); cb.classList.toggle('on'); cb.innerHTML=cb.classList.contains('on')?'<i class="ti ti-check"></i>':''; };
+      pl.appendChild(r);
+    });
+    document.getElementById('edit-camp-modal').classList.remove('hidden');
+  }
+  function closeEditCampModal(e){if(e&&e.target!==document.getElementById('edit-camp-modal'))return;document.getElementById('edit-camp-modal').classList.add('hidden');editingCampId=null;}
+  function saveEditCamp(){
+    const c=camps.find(x=>x.id===editingCampId);
+    c.name=document.getElementById('ec-name').value.trim()||c.name;
+    c.days=[...document.querySelectorAll('#ec-days .dtog.on')].map(el=>el.textContent);
+    c.pids=prospects.filter(p=>document.getElementById('ecp-'+p.id)?.classList.contains('on')).map(p=>String(p.id));
+    if(c.active){ prospects.forEach(p=>{p.today=c.pids.includes(String(p.id));}); }
+    save();
+    document.getElementById('edit-camp-modal').classList.add('hidden');
+    editingCampId=null;
+    renderCamps();refreshCurrentPanel();refreshSidebarStats();
+  }
 
   // ── DELETE ────────────────────────────────────────────────────────────
   function deleteProspect(id){const p=prospects.find(x=>x.id===id);if(!p)return;if(!confirm('¿Eliminar a '+p.name+'?'))return;trash.push({...p,deletedAt:new Date().toISOString()});prospects=prospects.filter(x=>x.id!==id);camps.forEach(c=>{c.pids=c.pids.filter(pid=>String(pid)!==String(id));});save();refreshCurrentPanel();refreshSidebarStats();}
