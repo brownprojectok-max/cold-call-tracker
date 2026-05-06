@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ColdTrack — Desktop</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+  <style>
+    :root{--bg:#f7f7f5;--bg2:#ffffff;--bg3:#eeede8;--text:#111;--text2:#666;--text3:#aaa;--border:rgba(0,0,0,.1);--border2:rgba(0,0,0,.18);--green:#1D9E75;--green-light:#E1F5EE;--green-dark:#085041;--green-mid:#0F6E56;--blue:#185FA5;--blue-light:#E6F1FB;--red:#A32D2D;--red-light:#FCEBEB;--orange:#BA7517;--orange-light:#FAEEDA;--amber:#633806;--amber-light:#FAEEDA;--gray-light:#F1EFE8;--gray:#5F5E5A;--sidebar:240px;--r:10px}
+    @media(prefers-color-scheme:dark){:root{--bg:#18181a;--bg2:#1c1c1e;--bg3:#2c2c2e;--text:#fff;--text2:#ababab;--text3:#6e6e6e;--border:rgba(255,255,255,.1);--border2:rgba(255,255,255,.2);--green-light:#0a2e22;--green-dark:#9FE1CB;--green-mid:#5DCAA5;--blue-light:#0c2540;--red-light:#2d0f0f;--red:#f09595;--orange-light:#2e1a00;--amber-light:#2e1a00;--gray-light:#2c2c2e;--gray:#ababab}}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+
+    /* TOP BAR */
+    .topbar{height:52px;background:var(--bg2);border-bottom:.5px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:16px;flex-shrink:0}
+    .logo{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.5px}
+    .sync-pill{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);padding:4px 10px;border-radius:100px;background:var(--bg3)}
+    .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
+    .sync-dot.off{background:#E24B4A}
+    .sync-dot.syncing{background:#BA7517;animation:pulse 1s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .topbar-spacer{flex:1}
+    .tb-btn{padding:6px 14px;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;border:.5px solid var(--border2);background:var(--bg3);color:var(--text);display:flex;align-items:center;gap:6px;white-space:nowrap}
+    .tb-btn.primary{background:var(--green);color:#fff;border-color:var(--green)}
+    .tb-btn:hover{opacity:.85}
+
+    /* LAYOUT */
+    .main{display:flex;flex:1;overflow:hidden}
+
+    /* SIDEBAR */
+    .sidebar{width:var(--sidebar);background:var(--bg2);border-right:.5px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+    .sidebar-section{padding:16px 12px 8px;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--r);margin:1px 8px;font-size:14px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;border:none;background:none;font-family:inherit;width:calc(100% - 16px);text-align:left}
+    .nav-item i{font-size:18px;width:20px;flex-shrink:0}
+    .nav-item:hover{background:var(--bg3)}
+    .nav-item.on{background:var(--green-light);color:var(--green-mid);font-weight:600}
+    .nav-item.on i{color:var(--green)}
+    .sidebar-stats{margin:auto 0 0;padding:12px;border-top:.5px solid var(--border)}
+    .mini-stat{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:var(--r);background:var(--bg3);margin-bottom:6px}
+    .mini-stat-lbl{font-size:12px;color:var(--text2)}
+    .mini-stat-val{font-size:14px;font-weight:700;color:var(--text)}
+
+    /* CONTENT */
+    .content{flex:1;overflow-y:auto;padding:24px}
+    .panel{display:none}
+    .panel.on{display:flex;flex-direction:column;gap:20px}
+    .panel-title{font-size:22px;font-weight:700;color:var(--text)}
+
+    /* TABLE */
+    .tbl-wrap{background:var(--bg2);border-radius:var(--r);border:.5px solid var(--border);overflow:hidden}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th{padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--text2);background:var(--bg3);border-bottom:.5px solid var(--border);white-space:nowrap}
+    td{padding:11px 14px;border-bottom:.5px solid var(--border);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:var(--bg3)}
+    .av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+    .av-teal{background:#9FE1CB;color:#085041}.av-blue{background:#B5D4F4;color:#0C447C}.av-amber{background:#FAC775;color:#633806}.av-purple{background:#CECBF6;color:#3C3489}.av-coral{background:#F5C4B3;color:#712B13}
+    .name-cell{display:flex;align-items:center;gap:10px}
+    .name-info .pname{font-size:14px;font-weight:600;color:var(--text)}
+    .name-info .pco{font-size:12px;color:var(--text2);margin-top:1px}
+    .ph-link{color:var(--blue);text-decoration:none;font-size:13px}
+    .ph-link:hover{text-decoration:underline}
+    .bdg{font-size:11px;padding:3px 9px;border-radius:100px;font-weight:600;white-space:nowrap;display:inline-block}
+    .b-pend{background:var(--gray-light);color:var(--gray)}.b-sched{background:var(--green-light);color:var(--green-mid)}.b-nope{background:var(--red-light);color:var(--red)}.b-calld{background:var(--blue-light);color:var(--blue)}.b-followup{background:var(--orange-light);color:var(--orange)}
+    .tbl-status-sel{font-size:13px;padding:5px 8px;border:.5px solid var(--border2);border-radius:8px;background:var(--bg);color:var(--text);cursor:pointer;font-family:inherit}
+    .icon-btn{width:32px;height:32px;border-radius:8px;border:.5px solid var(--border2);background:var(--bg3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:16px;transition:all .15s}
+    .icon-btn:hover{color:var(--text);background:var(--bg)}
+    .icon-btn.red:hover{color:var(--red);border-color:var(--red-light);background:var(--red-light)}
+    .icon-btn.green{background:var(--green);color:#fff;border-color:var(--green)}
+    .icon-btn.green:hover{opacity:.85}
+    .row-actions{display:flex;gap:6px}
+    .note-cell{font-size:12px;color:var(--text2);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .fu-cell{font-size:12px;color:var(--orange);font-weight:500}
+
+    /* SEARCH & FILTER */
+    .tbl-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .search-wrap{position:relative;flex:1;min-width:200px;max-width:320px}
+    .search-wrap input{width:100%;padding:8px 12px 8px 36px;font-size:14px;border:.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);font-family:inherit}
+    .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:17px;color:var(--text3);pointer-events:none}
+    .filter-chips{display:flex;gap:6px;flex-wrap:wrap}
+    .fchip{padding:6px 14px;border-radius:100px;font-size:12px;font-weight:500;border:1px solid var(--border2);background:var(--bg2);color:var(--text2);cursor:pointer;transition:all .15s;font-family:inherit}
+    .fchip.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+
+    /* CAMPAIGN CARDS */
+    .camp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+    .camp-card{background:var(--bg2);border:.5px solid var(--border);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px}
+    .camp-card.active-c{border-color:var(--green);border-width:1.5px}
+    .camp-card-top{display:flex;align-items:flex-start;gap:12px}
+    .camp-ico{width:42px;height:42px;border-radius:10px;background:var(--green-light);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--green-mid);flex-shrink:0}
+    .camp-info .camp-name{font-size:15px;font-weight:600;color:var(--text)}
+    .camp-info .camp-meta{font-size:12px;color:var(--text2);margin-top:2px}
+    .camp-bar{height:4px;background:var(--bg3);border-radius:2px}
+    .camp-bar-fill{height:100%;border-radius:2px;background:var(--green)}
+    .camp-actions{display:flex;gap:8px}
+    .camp-btn{flex:1;padding:7px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;border:.5px solid var(--border2);background:var(--bg3);color:var(--text2);display:flex;align-items:center;justify-content:center;gap:4px;transition:all .15s}
+    .camp-btn:hover{background:var(--bg)}
+    .camp-btn.activate{background:var(--green-light);color:var(--green-mid);border-color:var(--green-light)}
+    .camp-btn.activate.active{background:var(--green);color:#fff;border-color:var(--green)}
+    .camp-btn.danger:hover{background:var(--red-light);color:var(--red);border-color:var(--red-light)}
+
+    /* NEW CAMPAIGN FORM */
+    .form-card{background:var(--bg2);border:.5px solid var(--border);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:14px;max-width:560px}
+    .field-grp{display:flex;flex-direction:column;gap:5px}
+    .field-lbl{font-size:12px;font-weight:500;color:var(--text2)}
+    .field-input{padding:9px 12px;font-size:14px;border:.5px solid var(--border2);border-radius:8px;background:var(--bg);color:var(--text);width:100%;font-family:inherit}
+    .day-grid{display:flex;gap:6px;flex-wrap:wrap}
+    .dtog{padding:7px 14px;border-radius:100px;border:1px solid var(--border2);background:var(--bg);color:var(--text2);font-size:13px;cursor:pointer;font-weight:500;transition:all .15s;font-family:inherit}
+    .dtog.on{background:var(--green-light);border-color:var(--green);color:var(--green-mid)}
+    .form-actions{display:flex;gap:10px}
+    .btn-primary{padding:9px 20px;background:var(--green);color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+    .btn-secondary{padding:9px 20px;background:var(--bg3);color:var(--text);border:.5px solid var(--border2);border-radius:var(--r);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit}
+
+    /* STATS */
+    .stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+    .stat-box{background:var(--bg2);border:.5px solid var(--border);border-radius:var(--r);padding:16px}
+    .stat-lbl{font-size:12px;color:var(--text2);margin-bottom:8px}
+    .stat-val{font-size:32px;font-weight:700;color:var(--text);line-height:1}
+    .stat-sub{font-size:12px;color:var(--text2);margin-top:4px}
+    .bar-row{display:flex;align-items:center;gap:12px}
+    .bar-lbl{font-size:13px;color:var(--text2);width:130px;flex-shrink:0}
+    .bar-track{flex:1;height:12px;background:var(--bg3);border-radius:6px;overflow:hidden}
+    .bar-fill{height:100%;border-radius:6px;transition:width .4s}
+    .bar-n{font-size:14px;font-weight:700;color:var(--text);min-width:28px;text-align:right}
+
+    /* FOLLOW UP */
+    .fu-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg2);border:.5px solid var(--orange);border-radius:var(--r);margin-bottom:8px}
+    .fu-row.overdue{border-color:var(--red);background:var(--red-light)}
+    .fu-info{flex:1}
+    .fu-name{font-size:14px;font-weight:600;color:var(--text)}
+    .fu-meta{font-size:12px;color:var(--text2);margin-top:2px}
+    .fu-time{font-size:12px;color:var(--orange);font-weight:600;margin-top:3px}
+    .fu-row.overdue .fu-time{color:var(--red)}
+
+    /* TRASH */
+    .trash-row{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--bg2);border:.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;opacity:.75}
+    .trash-info{flex:1}
+    .trash-name{font-size:14px;font-weight:600;color:var(--text)}
+    .trash-meta{font-size:12px;color:var(--text2);margin-top:2px}
+
+    /* MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;display:flex;align-items:center;justify-content:center}
+    .modal-box{background:var(--bg2);border-radius:14px;padding:24px;width:100%;max-width:420px;display:flex;flex-direction:column;gap:16px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+    .modal-title{font-size:18px;font-weight:700;color:var(--text)}
+
+    /* PROSPECT SELECT */
+    .psel-list{max-height:200px;overflow-y:auto;border:.5px solid var(--border2);border-radius:var(--r);background:var(--bg)}
+    .pselrow{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:.5px solid var(--border);cursor:pointer}
+    .pselrow:last-child{border-bottom:none}
+    .pselrow:hover{background:var(--bg3)}
+    .chk{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border2);background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;color:transparent;transition:all .15s}
+    .chk.on{background:var(--green);border-color:var(--green);color:#fff}
+
+    /* ADD PROSPECT PANEL */
+    .add-form{background:var(--bg2);border:.5px solid var(--border);border-radius:var(--r);padding:20px;display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end;max-width:800px}
+
+    /* LOADING */
+    .loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:9999}
+    .logo-big{font-size:36px;font-weight:700;color:var(--text);letter-spacing:-1px}
+    .spinner{width:28px;height:28px;border:3px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* UTILS */
+    .hidden{display:none!important}
+    .sec-title{font-size:16px;font-weight:600;color:var(--text)}
+    .sec-hdr{display:flex;align-items:center;justify-content:space-between}
+    .empty-state{text-align:center;padding:60px 20px;color:var(--text2)}
+    .empty-state i{font-size:40px;margin-bottom:12px;display:block}
+
+    /* IMPORT AREA */
+    .upload-zone{border:2px dashed var(--border2);border-radius:var(--r);padding:30px;text-align:center;cursor:pointer;transition:background .15s;max-width:480px}
+    .upload-zone:hover{background:var(--bg3)}
+    .dup-toast{background:var(--amber-light);border:1px solid #FAC775;border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--amber)}
+    .prev-card{background:var(--bg2);border:.5px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .prev-card.dup{border-color:#FAC775;background:var(--amber-light)}
+    .seg-ctrl{display:flex;background:var(--bg3);border-radius:var(--r);padding:3px;gap:3px}
+    .seg-btn{flex:1;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;border:none;cursor:pointer;font-family:inherit;background:transparent;color:var(--text2);transition:all .15s}
+    .seg-btn.on{background:var(--bg2);color:var(--text)}
+  </style>
+</head>
+<body>
+
+<div class="loading-screen" id="loading-screen">
+  <div class="logo-big">ColdTrack</div>
+  <div class="spinner"></div>
+  <div style="font-size:13px;color:var(--text2)">Conectando con Firebase...</div>
+</div>
+
+<div id="app-root" class="hidden" style="display:flex;flex-direction:column;height:100vh">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="logo">ColdTrack</div>
+    <div class="sync-pill">
+      <div class="sync-dot off" id="sync-dot"></div>
+      <span id="sync-lbl">Conectando...</span>
+    </div>
+    <div class="topbar-spacer"></div>
+    <button class="tb-btn" onclick="switchPanel('import')"><i class="ti ti-upload"></i> Importar CSV</button>
+    <button class="tb-btn primary" onclick="openAddModal()"><i class="ti ti-plus"></i> Nuevo prospecto</button>
+  </div>
+
+  <div class="main">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-section">Menú</div>
+      <button class="nav-item on" id="nav-today" onclick="switchPanel('today')"><i class="ti ti-home"></i> Hoy</button>
+      <button class="nav-item" id="nav-prospects" onclick="switchPanel('prospects')"><i class="ti ti-users"></i> Prospectos</button>
+      <button class="nav-item" id="nav-campaigns" onclick="switchPanel('campaigns')"><i class="ti ti-speakerphone"></i> Campañas</button>
+      <button class="nav-item" id="nav-followup" onclick="switchPanel('followup')"><i class="ti ti-bell"></i> Follow Up <span id="fu-badge-side" class="hidden" style="margin-left:auto;background:#E24B4A;color:#fff;font-size:10px;padding:2px 7px;border-radius:100px;font-weight:700"></span></button>
+      <button class="nav-item" id="nav-stats" onclick="switchPanel('stats')"><i class="ti ti-chart-bar"></i> Stats</button>
+      <button class="nav-item" id="nav-import" onclick="switchPanel('import')"><i class="ti ti-upload"></i> Importar</button>
+      <button class="nav-item" id="nav-trash" onclick="switchPanel('trash')"><i class="ti ti-trash"></i> Papelera</button>
+
+      <div class="sidebar-stats">
+        <div class="mini-stat"><span class="mini-stat-lbl">Prospectos</span><span class="mini-stat-val" id="sb-total">0</span></div>
+        <div class="mini-stat"><span class="mini-stat-lbl">Llamados</span><span class="mini-stat-val" id="sb-called">0</span></div>
+        <div class="mini-stat"><span class="mini-stat-lbl">Citas</span><span class="mini-stat-val" id="sb-sched">0</span></div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- HOY -->
+      <div class="panel on" id="panel-today">
+        <div class="sec-hdr">
+          <div>
+            <div class="panel-title" id="today-title">Hoy</div>
+            <div style="font-size:13px;color:var(--text2);margin-top:2px">Campaña activa: <strong id="today-camp-name">—</strong></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:20px">
+            <div style="text-align:right"><div style="font-size:28px;font-weight:700;color:var(--green)" id="today-prog">0/0</div><div style="font-size:12px;color:var(--text2)">llamadas</div></div>
+          </div>
+        </div>
+        <div class="tbl-wrap"><table><thead><tr><th>Prospecto</th><th>Teléfono</th><th>Estado</th><th>Nota</th><th>Follow Up</th><th>Acciones</th></tr></thead><tbody id="today-tbody"></tbody></table></div>
+      </div>
+
+      <!-- PROSPECTOS -->
+      <div class="panel hidden" id="panel-prospects">
+        <div class="sec-hdr">
+          <div class="panel-title" id="all-count-lbl">Prospectos</div>
+        </div>
+        <div class="tbl-controls">
+          <div class="search-wrap"><i class="ti ti-search search-icon"></i><input type="search" placeholder="Buscar nombre, empresa, teléfono..." oninput="filterDesk(this.value)" id="desk-srch" /></div>
+          <div class="filter-chips">
+            <button class="fchip on" onclick="setDeskFilter(this,'all')">Todos</button>
+            <button class="fchip" onclick="setDeskFilter(this,'pending')">Sin llamar</button>
+            <button class="fchip" onclick="setDeskFilter(this,'called')">Llamado</button>
+            <button class="fchip" onclick="setDeskFilter(this,'scheduled')">Cita agendada</button>
+            <button class="fchip" onclick="setDeskFilter(this,'followup')">Follow Up</button>
+            <button class="fchip" onclick="setDeskFilter(this,'not-interested')">No interesado</button>
+          </div>
+        </div>
+        <div class="tbl-wrap"><table><thead><tr><th>Prospecto</th><th>Teléfono</th><th>Estado</th><th>Nota</th><th>Follow Up</th><th>En campaña</th><th>Acciones</th></tr></thead><tbody id="all-tbody"></tbody></table></div>
+      </div>
+
+      <!-- CAMPAÑAS -->
+      <div class="panel hidden" id="panel-campaigns">
+        <div class="sec-hdr">
+          <div class="panel-title">Campañas</div>
+          <button class="tb-btn primary" onclick="toggleNewCampForm()"><i class="ti ti-plus"></i> Nueva campaña</button>
+        </div>
+        <div id="new-camp-form" class="form-card hidden">
+          <div style="font-size:16px;font-weight:600;color:var(--text)">Nueva campaña</div>
+          <div class="field-grp"><div class="field-lbl">Nombre</div><input class="field-input" id="nc-name" placeholder="Ej. Tech SaaS — Junio" /></div>
+          <div class="field-grp"><div class="field-lbl">Días activos</div><div class="day-grid">
+            <button class="dtog" onclick="this.classList.toggle('on')">Lunes</button>
+            <button class="dtog" onclick="this.classList.toggle('on')">Martes</button>
+            <button class="dtog" onclick="this.classList.toggle('on')">Miércoles</button>
+            <button class="dtog" onclick="this.classList.toggle('on')">Jueves</button>
+            <button class="dtog" onclick="this.classList.toggle('on')">Viernes</button>
+            <button class="dtog" onclick="this.classList.toggle('on')">Sábado</button>
+          </div></div>
+          <div class="field-grp">
+            <div class="field-lbl">Prospectos</div>
+            <div class="seg-ctrl" id="camp-seg" style="width:280px">
+              <button class="seg-btn on" onclick="setCampSeg(this,'manual')">Selección manual</button>
+              <button class="seg-btn" onclick="setCampSeg(this,'list')">Por lista CSV</button>
+            </div>
+          </div>
+          <div id="nc-manual-wrap"><div class="psel-list" id="nc-prospects"></div></div>
+          <div id="nc-list-wrap" class="hidden">
+            <div class="field-grp"><div class="field-lbl">Lista CSV importada</div><select class="field-input" id="nc-list-select" onchange="loadListProspectsDesk(this.value)" style="width:280px"><option value="">— Elegir lista —</option></select></div>
+            <div class="psel-list" style="margin-top:8px" id="nc-list-prospects"></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-secondary" onclick="toggleNewCampForm()">Cancelar</button>
+            <button class="btn-primary" onclick="createCampaign()">Crear campaña</button>
+          </div>
+        </div>
+        <div class="camp-grid" id="camp-grid"></div>
+      </div>
+
+      <!-- FOLLOW UP -->
+      <div class="panel hidden" id="panel-followup">
+        <div class="panel-title">Follow Up</div>
+        <div id="fu-overdue-d" class="hidden"><div style="font-size:13px;font-weight:600;color:var(--red);margin-bottom:8px">Vencidos</div><div id="fu-overdue-list-d"></div></div>
+        <div id="fu-upcoming-d" class="hidden"><div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">Próximos</div><div id="fu-upcoming-list-d"></div></div>
+        <div id="fu-empty-d" class="empty-state"><i class="ti ti-bell-off"></i>Sin follow ups pendientes</div>
+      </div>
+
+      <!-- STATS -->
+      <div class="panel hidden" id="panel-stats">
+        <div class="panel-title">Estadísticas</div>
+        <div class="stat-grid">
+          <div class="stat-box"><div class="stat-lbl">Total prospectos</div><div class="stat-val" id="st-all">0</div></div>
+          <div class="stat-box"><div class="stat-lbl">Llamados</div><div class="stat-val" id="st-total">0</div><div class="stat-sub" id="st-rate"></div></div>
+          <div class="stat-box"><div class="stat-lbl">Citas agendadas</div><div class="stat-val" id="st-sched">0</div></div>
+          <div class="stat-box"><div class="stat-lbl">Follow Ups activos</div><div class="stat-val" id="st-fu">0</div></div>
+        </div>
+        <div class="sec-title">Por estado</div>
+        <div style="background:var(--bg2);border:.5px solid var(--border);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:14px" id="stat-bars"></div>
+        <div class="sec-title">Por campaña</div>
+        <div class="camp-grid" id="camp-stats-grid"></div>
+      </div>
+
+      <!-- IMPORTAR -->
+      <div class="panel hidden" id="panel-import">
+        <div class="panel-title">Importar prospectos</div>
+        <div class="upload-zone" onclick="document.getElementById('file-in').click()">
+          <i class="ti ti-file-spreadsheet" style="font-size:32px;color:var(--text2);margin-bottom:8px;display:block"></i>
+          <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px">Subir CSV</div>
+          <div style="font-size:13px;color:var(--text2)">Columnas: Nombre, Empresa, Teléfono — Opcional: Email, Notas</div>
+        </div>
+        <input type="file" id="file-in" style="display:none" accept=".csv" onchange="handleCSV(this)" />
+        <div id="preview-block" class="hidden" style="display:flex;flex-direction:column;gap:10px;max-width:560px">
+          <div id="dup-notice" class="dup-toast hidden"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="sec-title" id="preview-lbl">Vista previa</div><div style="display:flex;gap:8px"><button class="btn-secondary" onclick="skipAllDups()">Saltar duplicados</button><button class="btn-primary" onclick="doImport()">Importar seleccionados</button></div></div>
+          <div id="preview-list" style="display:flex;flex-direction:column;gap:6px"></div>
+        </div>
+      </div>
+
+      <!-- PAPELERA -->
+      <div class="panel hidden" id="panel-trash">
+        <div class="sec-hdr"><div class="panel-title">Papelera</div><button class="tb-btn" id="empty-trash-btn" onclick="emptyTrash()" style="color:var(--red)"><i class="ti ti-trash"></i> Vaciar todo</button></div>
+        <div id="trash-empty-d" class="empty-state"><i class="ti ti-trash-off"></i>La papelera está vacía</div>
+        <div id="trash-list-d"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-overlay hidden" id="edit-modal" onclick="closeModal(event)">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-title">Nuevo prospecto</div>
+    <div class="field-grp"><div class="field-lbl">Nombre</div><input class="field-input" id="edit-name" placeholder="Nombre completo" /></div>
+    <div class="field-grp"><div class="field-lbl">Empresa</div><input class="field-input" id="edit-co" placeholder="Empresa" /></div>
+    <div class="field-grp"><div class="field-lbl">Teléfono</div><input class="field-input" id="edit-ph" placeholder="+34 6XX XXX XXX" type="tel" /></div>
+    <div class="form-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn-primary" onclick="saveModal()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+  // ── FIREBASE ──────────────────────────────────────────────────────────
+  const firebaseConfig = {
+    apiKey: "AIzaSyDZK9d0EWuybv4bDVsscJZhMusaob4DD4U",
+    authDomain: "coldtrack-66b1b.firebaseapp.com",
+    databaseURL: "https://coldtrack-66b1b-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "coldtrack-66b1b",
+    storageBucket: "coldtrack-66b1b.firebasestorage.app",
+    messagingSenderId: "1065860248642",
+    appId: "1:1065860248642:web:19c34375c593501ced69db"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const REF = db.ref('coldtrack');
+
+  let remoteWriting = false;
+  function setSyncStatus(state){const dot=document.getElementById('sync-dot');const lbl=document.getElementById('sync-lbl');dot.className='sync-dot '+(state==='ok'?'':state==='syncing'?'syncing':'off');lbl.textContent=state==='ok'?'Sincronizado':state==='syncing'?'Guardando...':'Sin conexión';}
+  db.ref('.info/connected').on('value',snap=>setSyncStatus(snap.val()?'ok':'off'));
+
+  // ── DATA ──────────────────────────────────────────────────────────────
+  const avs=['av-teal','av-blue','av-amber','av-purple','av-coral'];
+  const si={pending:{l:'Sin llamar',c:'b-pend'},called:{l:'Llamado',c:'b-calld'},scheduled:{l:'Cita agendada',c:'b-sched'},'not-interested':{l:'No interesado',c:'b-nope'},followup:{l:'Follow Up',c:'b-followup'}};
+  let nid=Date.now(),deskFilter='all',deskSearch='',editingId=null,isNewProspect=false,pendingImport=[],campSeg='manual',csvLists=[];
+  let prospects=[],camps=[],trash=[],appReady=false;
+
+  function save(){if(!appReady)return;setSyncStatus('syncing');remoteWriting=true;REF.set({prospects,camps,trash,csvLists:csvLists||[]},err=>{setSyncStatus(err?'off':'ok');setTimeout(()=>{remoteWriting=false;},500);});}
+
+  REF.on('value',snap=>{
+    if(remoteWriting)return;
+    const data=snap.val();
+    if(data){prospects=data.prospects||[];camps=data.camps||[];trash=data.trash||[];csvLists=data.csvLists||[];nid=Math.max(nid,...prospects.map(p=>p.id||0),Date.now());}
+    if(!appReady){appReady=true;document.getElementById('loading-screen').style.display='none';document.getElementById('app-root').classList.remove('hidden');document.getElementById('app-root').style.display='flex';initToday();refreshCurrentPanel();}
+    else{refreshCurrentPanel();}
+    refreshSidebarStats();refreshFuBadge();setSyncStatus('ok');
+  });
+
+  // ── HELPERS ───────────────────────────────────────────────────────────
+  function ini(n){return n.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();}
+  const DAYS_ES=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const MONTHS_ES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  function fmtDatetime(iso){if(!iso)return'';const d=new Date(iso);return DAYS_ES[d.getDay()]+' '+d.getDate()+' '+MONTHS_ES[d.getMonth()]+', '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+
+  function initToday(){const now=new Date();const days=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];document.getElementById('today-title').textContent=days[now.getDay()].charAt(0).toUpperCase()+days[now.getDay()].slice(1)+' '+now.getDate()+' de '+MONTHS_ES[now.getMonth()];}
+
+  // ── TABLE ROW ─────────────────────────────────────────────────────────
+  function makeRow(p,showCamp){
+    const s=si[p.status]||si.pending;
+    const campName=showCamp?(camps.find(c=>c.pids&&c.pids.includes(p.id))?.name||'—'):'';
+    const fuHtml=p.followup?`<span style="font-size:12px;color:var(--orange);font-weight:500"><i class="ti ti-bell" style="font-size:11px"></i> ${fmtDatetime(p.followup)}</span>`:`<button onclick="openFuModal(${p.id})" style="font-size:12px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:inherit">+ Recordar</button>`;
+    return `<tr id="row-${p.id}">
+      <td><div class="name-cell"><div class="av ${p.av}">${ini(p.name)}</div><div class="name-info"><div class="pname">${p.name}</div><div class="pco">${p.co}</div></div></div></td>
+      <td><a href="tel:${p.ph.replace(/\s/g,'')}" class="ph-link"><i class="ti ti-phone" style="font-size:13px"></i> ${p.ph}</a></td>
+      <td><select class="tbl-status-sel" onchange="setStatus(${p.id},this.value)"><option value="pending"${p.status==='pending'?' selected':''}>Sin llamar</option><option value="called"${p.status==='called'?' selected':''}>Llamado</option><option value="scheduled"${p.status==='scheduled'?' selected':''}>Cita agendada</option><option value="followup"${p.status==='followup'?' selected':''}>Follow Up</option><option value="not-interested"${p.status==='not-interested'?' selected':''}>No interesado</option></select></td>
+      <td><div class="note-cell" title="${p.note||''}">${p.note||'<span style="color:var(--text3)">—</span>'}</div></td>
+      <td>${fuHtml}</td>
+      ${showCamp?`<td style="font-size:12px;color:var(--text2)">${campName}</td>`:''}
+      <td><div class="row-actions">
+        <button class="icon-btn" onclick="openEditModal(${p.id})" title="Editar"><i class="ti ti-edit"></i></button>
+        <button class="icon-btn red" onclick="deleteProspect(${p.id})" title="Eliminar"><i class="ti ti-trash"></i></button>
+      </div></td>
+    </tr>`;
+  }
+
+  // ── PANELS ────────────────────────────────────────────────────────────
+  let currentPanel='today';
+  const PANELS=['today','prospects','campaigns','followup','stats','import','trash'];
+
+  function switchPanel(name){
+    currentPanel=name;
+    PANELS.forEach(p=>{document.getElementById('panel-'+p).classList.toggle('on',p===name);document.getElementById('panel-'+p).classList.toggle('hidden',p!==name);const n=document.getElementById('nav-'+p);if(n)n.classList.toggle('on',p===name);});
+    refreshCurrentPanel();
+  }
+
+  function refreshCurrentPanel(){
+    if(currentPanel==='today')renderToday();
+    else if(currentPanel==='prospects')renderAll();
+    else if(currentPanel==='campaigns')renderCamps();
+    else if(currentPanel==='followup')renderFollowUp();
+    else if(currentPanel==='stats')renderStats();
+    else if(currentPanel==='trash')renderTrash();
+  }
+
+  function renderToday(){
+    const ac=camps.find(c=>c.active);document.getElementById('today-camp-name').textContent=ac?ac.name:'Ninguna activa';
+    const list=prospects.filter(p=>p.today);
+    const done=list.filter(p=>p.status!=='pending').length;
+    document.getElementById('today-prog').textContent=done+'/'+list.length;
+    const tbody=document.getElementById('today-tbody');
+    tbody.innerHTML=list.length?list.map(p=>makeRow(p,false)).join(''):`<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">Sin prospectos para hoy. Activá una campaña.</td></tr>`;
+  }
+
+  function renderAll(){
+    let r=prospects;
+    if(deskFilter&&deskFilter!=='all')r=r.filter(p=>p.status===deskFilter);
+    if(deskSearch)r=r.filter(p=>p.name.toLowerCase().includes(deskSearch.toLowerCase())||p.co.toLowerCase().includes(deskSearch.toLowerCase())||p.ph.includes(deskSearch));
+    document.getElementById('all-count-lbl').textContent=r.length+' prospecto'+(r.length!==1?'s':'');
+    const tbody=document.getElementById('all-tbody');
+    tbody.innerHTML=r.length?r.map(p=>makeRow(p,true)).join(''):`<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text2)">Sin prospectos.</td></tr>`;
+  }
+
+  function filterDesk(v){deskSearch=v;renderAll();}
+  function setDeskFilter(el,f){document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('on'));el.classList.add('on');deskFilter=f;renderAll();}
+
+  function setStatus(id,val){const p=prospects.find(x=>x.id===id);p.status=val;save();refreshCurrentPanel();refreshSidebarStats();}
+
+  // ── FOLLOW UP MODAL ───────────────────────────────────────────────────
+  let fuEditingId=null;
+  function openFuModal(id){fuEditingId=id;const dt=prompt('Fecha y hora de follow up (ej: 2026-05-10T10:00)');if(!dt)return;const p=prospects.find(x=>x.id===id);p.followup=dt;if(p.status==='pending')p.status='followup';save();refreshCurrentPanel();refreshFuBadge();}
+
+  function renderFollowUp(){
+    const now=new Date();const all=prospects.filter(p=>p.followup);
+    const overdue=all.filter(p=>new Date(p.followup)<now).sort((a,b)=>new Date(a.followup)-new Date(b.followup));
+    const upcoming=all.filter(p=>new Date(p.followup)>=now).sort((a,b)=>new Date(a.followup)-new Date(b.followup));
+    document.getElementById('fu-empty-d').classList.toggle('hidden',all.length>0);
+    document.getElementById('fu-overdue-d').classList.toggle('hidden',overdue.length===0);
+    document.getElementById('fu-upcoming-d').classList.toggle('hidden',upcoming.length===0);
+    renderFuList('fu-overdue-list-d',overdue,true);renderFuList('fu-upcoming-list-d',upcoming,false);
+  }
+  function renderFuList(elId,list,isOverdue){const l=document.getElementById(elId);l.innerHTML='';list.forEach(p=>{const d=document.createElement('div');d.className='fu-row'+(isOverdue?' overdue':'');d.innerHTML=`<div class="av ${p.av}" style="width:36px;height:36px;font-size:12px">${ini(p.name)}</div><div class="fu-info"><div class="fu-name">${p.name}</div><div class="fu-meta">${p.co} · ${p.ph}</div><div class="fu-time"><i class="ti ti-bell" style="font-size:11px"></i> ${fmtDatetime(p.followup)}${isOverdue?' — VENCIDO':''}</div></div><a href="tel:${p.ph.replace(/\s/g,'')}" class="icon-btn green" title="Llamar"><i class="ti ti-phone"></i></a>`;l.appendChild(d);});}
+  function refreshFuBadge(){const now=new Date();const overdue=prospects.filter(p=>p.followup&&new Date(p.followup)<now);const badge=document.getElementById('fu-badge-side');badge.classList.toggle('hidden',overdue.length===0);badge.textContent=overdue.length||'';}
+
+  // ── CAMPAIGNS ─────────────────────────────────────────────────────────
+  function sortedCamps(){return[...camps].sort((a,b)=>{if(a.active&&!b.active)return-1;if(!a.active&&b.active)return 1;return b.id-a.id;});}
+  function renderCamps(){
+    const grid=document.getElementById('camp-grid');grid.innerHTML='';
+    sortedCamps().forEach(c=>{
+      const ps=c.pids.map(id=>prospects.find(p=>p.id===id)).filter(Boolean);
+      const done=ps.filter(p=>p.status!=='pending').length;const pct=Math.round((done/(ps.length||1))*100);
+      const card=document.createElement('div');card.className='camp-card'+(c.active?' active-c':'');
+      card.innerHTML=`<div class="camp-card-top"><div class="camp-ico"><i class="ti ti-speakerphone"></i></div><div class="camp-info"><div class="camp-name">${c.name}${c.active?' <span class="bdg b-sched" style="font-size:10px;margin-left:4px">Activa</span>':''}</div><div class="camp-meta">${ps.length} prospectos · ${done} llamados · ${c.days.slice(0,3).join(', ')}</div></div></div><div class="camp-bar"><div class="camp-bar-fill" style="width:${pct}%"></div></div><div style="font-size:12px;color:var(--text2)">${pct}% completado</div><div class="camp-actions"><button class="camp-btn activate ${c.active?'active':''}" onclick="setActiveCamp(${c.id})"><i class="ti ti-${c.active?'check':'player-play'}"></i> ${c.active?'Activa':'Activar'}</button><button class="camp-btn" onclick="renameCamp(${c.id})"><i class="ti ti-edit"></i> Renombrar</button><button class="camp-btn danger" onclick="deleteCamp(${c.id})"><i class="ti ti-trash"></i> Eliminar</button></div>`;
+      grid.appendChild(card);
+    });
+    if(!camps.length)grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-speakerphone" style="font-size:40px;margin-bottom:12px;display:block"></i>Sin campañas. Creá una nueva.</div>';
+  }
+  function setActiveCamp(id){camps.forEach(c=>c.active=(c.id===id));const c=camps.find(x=>x.id===id);prospects.forEach(p=>{p.today=c.pids.includes(p.id);});save();renderCamps();if(currentPanel==='today')renderToday();}
+  function renameCamp(id){const c=camps.find(x=>x.id===id);const n=prompt('Nuevo nombre:',c.name);if(n&&n.trim()){c.name=n.trim();save();renderCamps();if(currentPanel==='today'){const ac=camps.find(c=>c.active);document.getElementById('today-camp-name').textContent=ac?ac.name:'—';}}}
+  function deleteCamp(id){const c=camps.find(x=>x.id===id);if(!confirm('¿Eliminar "'+c.name+'"?'))return;camps=camps.filter(x=>x.id!==id);if(c.active)prospects.forEach(p=>{p.today=false;});save();renderCamps();}
+
+  let campSegDesk='manual';
+  function toggleNewCampForm(){document.getElementById('new-camp-form').classList.toggle('hidden');populateManualList();populateCsvListSelectDesk();}
+  function setCampSeg(el,seg){campSegDesk=seg;document.querySelectorAll('#camp-seg .seg-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');document.getElementById('nc-manual-wrap').classList.toggle('hidden',seg!=='manual');document.getElementById('nc-list-wrap').classList.toggle('hidden',seg!=='list');}
+  function populateManualList(){const pl=document.getElementById('nc-prospects');pl.innerHTML='';prospects.forEach(p=>{const r=document.createElement('div');r.className='pselrow';r.innerHTML=`<div class="chk" id="ncp-${p.id}" onclick="this.classList.toggle('on');this.innerHTML=this.classList.contains('on')?'<i class=\\'ti ti-check\\'></i>':''"></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">${p.name}</div><div style="font-size:12px;color:var(--text2)">${p.co}</div></div>`;pl.appendChild(r);});}
+  function populateCsvListSelectDesk(){const sel=document.getElementById('nc-list-select');sel.innerHTML='<option value="">— Elegir lista —</option>';csvLists.forEach((list,i)=>{const o=document.createElement('option');o.value=i;o.textContent=list.name+' ('+list.ids.length+' contactos)';sel.appendChild(o);});}
+  function loadListProspectsDesk(idx){const pl=document.getElementById('nc-list-prospects');pl.innerHTML='';if(idx==='')return;const list=csvLists[parseInt(idx)];if(!list)return;list.ids.forEach(id=>{const p=prospects.find(x=>x.id===id);if(!p)return;const r=document.createElement('div');r.className='pselrow';r.innerHTML=`<div class="chk on" id="ncpl-${p.id}" onclick="this.classList.toggle('on');this.innerHTML=this.classList.contains('on')?'<i class=\\'ti ti-check\\'></i>':''"><i class="ti ti-check"></i></div><div><div style="font-size:13px;font-weight:500;color:var(--text)">${p.name}</div><div style="font-size:12px;color:var(--text2)">${p.co}</div></div>`;pl.appendChild(r);});}
+  function createCampaign(){const name=document.getElementById('nc-name').value.trim();if(!name){alert('Ingresá un nombre');return;}const days=[...document.querySelectorAll('#new-camp-form .dtog.on')].map(el=>el.textContent);let pids=[];if(campSegDesk==='manual'){pids=prospects.filter(p=>document.getElementById('ncp-'+p.id)?.classList.contains('on')).map(p=>p.id);}else{const idx=document.getElementById('nc-list-select').value;if(idx!==''){const list=csvLists[parseInt(idx)];pids=list.ids.filter(id=>document.getElementById('ncpl-'+id)?.classList.contains('on'));}}camps.push({id:Date.now(),name,days,pids,active:false});document.getElementById('nc-name').value='';document.querySelectorAll('#new-camp-form .dtog').forEach(el=>el.classList.remove('on'));toggleNewCampForm();save();renderCamps();}
+
+  // ── STATS ─────────────────────────────────────────────────────────────
+  function renderStats(){
+    const total=prospects.filter(p=>p.status!=='pending').length;const sched=prospects.filter(p=>p.status==='scheduled').length;const fu=prospects.filter(p=>p.followup).length;const pend=prospects.filter(p=>p.status==='pending').length;const called=prospects.filter(p=>p.status==='called').length;const nope=prospects.filter(p=>p.status==='not-interested').length;const rate=total>0?Math.round((sched/total)*100):0;
+    document.getElementById('st-all').textContent=prospects.length;document.getElementById('st-total').textContent=total;document.getElementById('st-rate').textContent=rate+'% tasa de cierre';document.getElementById('st-sched').textContent=sched;document.getElementById('st-fu').textContent=fu;
+    const bars=document.getElementById('stat-bars');bars.innerHTML='';const max=Math.max(sched,called,fu,nope,pend,1);
+    [{l:'Cita agendada',v:sched,col:'#1D9E75'},{l:'Llamado',v:called,col:'#378ADD'},{l:'Follow Up',v:fu,col:'#BA7517'},{l:'No interesado',v:nope,col:'#E24B4A'},{l:'Sin llamar',v:pend,col:'#888780'}].forEach(item=>{const r=document.createElement('div');r.className='bar-row';r.innerHTML=`<div class="bar-lbl">${item.l}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round((item.v/max)*100)}%;background:${item.col}"></div></div><div class="bar-n">${item.v}</div>`;bars.appendChild(r);});
+    const cg=document.getElementById('camp-stats-grid');cg.innerHTML='';camps.forEach(c=>{const ps=c.pids.map(id=>prospects.find(p=>p.id===id)).filter(Boolean);const d=ps.filter(p=>p.status!=='pending').length;const pct=Math.round((d/(ps.length||1))*100);const div=document.createElement('div');div.className='camp-card';div.innerHTML=`<div class="camp-card-top"><div class="camp-ico"><i class="ti ti-speakerphone"></i></div><div class="camp-info"><div class="camp-name">${c.name}</div><div class="camp-meta">${d} de ${ps.length} llamados</div></div></div><div class="camp-bar"><div class="camp-bar-fill" style="width:${pct}%"></div></div><div style="font-size:13px;font-weight:700;color:var(--text)">${pct}%</div>`;cg.appendChild(div);});
+  }
+
+  function refreshSidebarStats(){document.getElementById('sb-total').textContent=prospects.length;document.getElementById('sb-called').textContent=prospects.filter(p=>p.status!=='pending').length;document.getElementById('sb-sched').textContent=prospects.filter(p=>p.status==='scheduled').length;}
+
+  // ── ADD/EDIT MODAL ────────────────────────────────────────────────────
+  function openAddModal(){isNewProspect=true;editingId=null;document.getElementById('modal-title').textContent='Nuevo prospecto';document.getElementById('edit-name').value='';document.getElementById('edit-co').value='';document.getElementById('edit-ph').value='';document.getElementById('edit-modal').classList.remove('hidden');}
+  function openEditModal(id){isNewProspect=false;editingId=id;const p=prospects.find(x=>x.id===id);document.getElementById('modal-title').textContent='Editar prospecto';document.getElementById('edit-name').value=p.name;document.getElementById('edit-co').value=p.co;document.getElementById('edit-ph').value=p.ph;document.getElementById('edit-modal').classList.remove('hidden');}
+  function closeModal(e){if(e&&e.target!==document.getElementById('edit-modal'))return;document.getElementById('edit-modal').classList.add('hidden');}
+  function saveModal(){const n=document.getElementById('edit-name').value.trim();const c=document.getElementById('edit-co').value.trim();const ph=document.getElementById('edit-ph').value.trim();if(!n||!ph){alert('Nombre y teléfono son obligatorios');return;}if(isNewProspect){if(isDuplicate(n,ph)&&!confirm('Parece duplicado. ¿Agregás igual?'))return;prospects.push({id:nid++,name:n,co:c,ph,status:'pending',note:'',today:false,av:avs[nid%avs.length]});}else{const p=prospects.find(x=>x.id===editingId);p.name=n;p.co=c;p.ph=ph;}save();document.getElementById('edit-modal').classList.add('hidden');refreshCurrentPanel();refreshSidebarStats();}
+
+  // ── DELETE ────────────────────────────────────────────────────────────
+  function deleteProspect(id){const p=prospects.find(x=>x.id===id);if(!p)return;if(!confirm('¿Eliminar a '+p.name+'?'))return;trash.push({...p,deletedAt:new Date().toISOString()});prospects=prospects.filter(x=>x.id!==id);camps.forEach(c=>{c.pids=c.pids.filter(pid=>pid!==id);});save();refreshCurrentPanel();refreshSidebarStats();}
+
+  // ── TRASH ─────────────────────────────────────────────────────────────
+  function renderTrash(){const l=document.getElementById('trash-list-d');l.innerHTML='';document.getElementById('trash-empty-d').classList.toggle('hidden',trash.length>0);document.getElementById('empty-trash-btn').classList.toggle('hidden',trash.length===0);[...trash].reverse().forEach((p,ri)=>{const realIdx=trash.length-1-ri;const d=document.createElement('div');d.className='trash-row';d.innerHTML=`<div class="av ${p.av}" style="width:36px;height:36px;font-size:12px">${ini(p.name)}</div><div class="trash-info"><div class="trash-name">${p.name}</div><div class="trash-meta">${p.co} · Eliminado ${new Date(p.deletedAt).toLocaleDateString('es-ES')}</div></div><button class="tb-btn" onclick="restoreTrash(${realIdx})" style="color:var(--green)"><i class="ti ti-refresh"></i> Restaurar</button>`;l.appendChild(d);});}
+  function restoreTrash(idx){const p=trash.splice(idx,1)[0];const{deletedAt,...clean}=p;prospects.push(clean);save();renderTrash();refreshSidebarStats();}
+  function emptyTrash(){if(!confirm('¿Vaciar papelera?'))return;trash=[];save();renderTrash();}
+
+  // ── CSV IMPORT ────────────────────────────────────────────────────────
+  function isDuplicate(name,ph){const n=name.toLowerCase().trim();const p=ph.replace(/\s/g,'');return prospects.some(x=>x.name.toLowerCase().trim()===n||x.ph.replace(/\s/g,'')===p);}
+  function handleCSV(input){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const lines=e.target.result.split('\n').filter(l=>l.trim());const parsed=[];lines.slice(1).forEach(line=>{const cols=line.split(',').map(c=>c.trim().replace(/^"|"$/g,''));if(cols[0]&&cols[2]){parsed.push({id:nid++,name:cols[0],co:cols[1]||'',ph:cols[2]||'',status:'pending',note:cols[4]||'',today:false,av:avs[nid%avs.length],isDup:isDuplicate(cols[0],cols[2]),skip:false});}});pendingImport=parsed;const dupCount=parsed.filter(p=>p.isDup).length;const notice=document.getElementById('dup-notice');if(dupCount>0){notice.classList.remove('hidden');notice.textContent=`⚠️ ${dupCount} contacto${dupCount!==1?'s':''} duplicado${dupCount!==1?'s':''}. Marcados en amarillo.`;}else{notice.classList.add('hidden');}document.getElementById('preview-block').classList.remove('hidden');document.getElementById('preview-lbl').textContent=parsed.length+' detectados';renderPreviewList();};reader.readAsText(file);}
+  function renderPreviewList(){const pl=document.getElementById('preview-list');pl.innerHTML='';pendingImport.forEach((p,i)=>{const d=document.createElement('div');d.className='prev-card'+(p.isDup?' dup':'');d.innerHTML=`<div><div style="font-size:14px;font-weight:600;color:var(--text)">${p.name}${p.isDup?' <span style="font-size:11px;color:var(--amber)">Duplicado</span>':''}</div><div style="font-size:13px;color:var(--text2);margin-top:2px">${p.co} · ${p.ph}</div></div>${p.isDup&&!p.skip?`<button style="font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;font-family:inherit" onclick="skipDup(${i})">Saltar</button>`:p.skip?`<span style="font-size:12px;color:var(--text3)">Saltado</span>`:''}`;pl.appendChild(d);});}
+  function skipDup(i){pendingImport[i].skip=true;renderPreviewList();}
+  function skipAllDups(){pendingImport.forEach(p=>{if(p.isDup)p.skip=true;});renderPreviewList();}
+  function doImport(){const toImport=pendingImport.filter(p=>!p.skip);const listName='Lista '+new Date().toLocaleDateString('es-ES',{day:'numeric',month:'short'});const newIds=[];toImport.forEach(p=>{const{isDup,skip,...clean}=p;prospects.push(clean);newIds.push(clean.id);});if(newIds.length>0)csvLists.push({name:listName,ids:newIds});pendingImport=[];document.getElementById('preview-block').classList.add('hidden');document.getElementById('file-in').value='';save();refreshSidebarStats();alert('✓ '+toImport.length+' prospectos importados como "'+listName+'".');}
+
+  setInterval(refreshFuBadge,60000);
+</script>
+</body>
+</html>
