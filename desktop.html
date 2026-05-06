@@ -448,17 +448,17 @@
   function makeRow(p,showCamp){
     const s=si[p.status]||si.pending;
     const campName=showCamp?(camps.find(c=>c.pids&&c.pids.includes(String(p.id)))?.name||'—'):'';
-    const fuHtml=p.followup?`<span style="font-size:12px;color:var(--orange);font-weight:500"><i class="ti ti-bell" style="font-size:11px"></i> ${fmtDatetime(p.followup)}</span>`:`<button onclick="openFuModal(${p.id})" style="font-size:12px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:inherit">+ Recordar</button>`;
+    const fuHtml=p.followup?`<span style="font-size:12px;color:var(--orange);font-weight:500"><i class="ti ti-bell" style="font-size:11px"></i> ${fmtDatetime(p.followup)}</span>`:`<button onclick="openFuModal('${p.id}')" style="font-size:12px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:inherit">+ Recordar</button>`;
     return `<tr id="row-${p.id}">
       <td><div class="name-cell"><div class="av ${p.av}">${ini(p.name)}</div><div class="name-info"><div class="pname">${p.name}</div><div class="pco">${p.co}</div></div></div></td>
       <td><a href="tel:${p.ph.replace(/\s/g,'')}" class="ph-link"><i class="ti ti-phone" style="font-size:13px"></i> ${p.ph}</a></td>
-      <td><select class="tbl-status-sel" onchange="setStatus(${p.id},this.value)"><option value="pending"${p.status==='pending'?' selected':''}>Sin llamar</option><option value="called"${p.status==='called'?' selected':''}>Llamado</option><option value="scheduled"${p.status==='scheduled'?' selected':''}>Cita agendada</option><option value="followup"${p.status==='followup'?' selected':''}>Follow Up</option><option value="not-interested"${p.status==='not-interested'?' selected':''}>No interesado</option></select></td>
+      <td><select class="tbl-status-sel" onchange="setStatus('${p.id}',this.value)"><option value="pending"${p.status==='pending'?' selected':''}>Sin llamar</option><option value="called"${p.status==='called'?' selected':''}>Llamado</option><option value="scheduled"${p.status==='scheduled'?' selected':''}>Cita agendada</option><option value="followup"${p.status==='followup'?' selected':''}>Follow Up</option><option value="not-interested"${p.status==='not-interested'?' selected':''}>No interesado</option></select></td>
       <td><div class="note-cell" title="${p.note||''}">${p.note||'<span style="color:var(--text3)">—</span>'}</div></td>
       <td>${fuHtml}</td>
       ${showCamp?`<td style="font-size:12px;color:var(--text2)">${campName}</td>`:''}
       <td><div class="row-actions">
-        <button class="icon-btn" onclick="openEditModal(${p.id})" title="Editar"><i class="ti ti-edit"></i></button>
-        <button class="icon-btn red" onclick="deleteProspect(${p.id})" title="Eliminar"><i class="ti ti-trash"></i></button>
+        <button class="icon-btn" onclick="openEditModal('${p.id}')" title="Editar"><i class="ti ti-edit"></i></button>
+        <button class="icon-btn red" onclick="deleteProspect('${p.id}')" title="Eliminar"><i class="ti ti-trash"></i></button>
       </div></td>
     </tr>`;
   }
@@ -507,7 +507,7 @@
 
   // ── FOLLOW UP MODAL ───────────────────────────────────────────────────
   let fuEditingId=null;
-  function openFuModal(id){fuEditingId=id;const dt=prompt('Fecha y hora de follow up (ej: 2026-05-10T10:00)');if(!dt)return;const p=prospects.find(x=>x.id===id);p.followup=dt;if(p.status==='pending')p.status='followup';save();refreshCurrentPanel();refreshFuBadge();}
+  function openFuModal(id){fuEditingId=id;const dt=prompt('Fecha y hora de follow up (ej: 2026-05-10T10:00)');if(!dt)return;const p=prospects.find(x=>String(x.id)===String(id));p.followup=dt;if(p.status==='pending')p.status='followup';save();refreshCurrentPanel();refreshFuBadge();}
 
   function renderFollowUp(){
     const now=new Date();const all=prospects.filter(p=>p.followup);
@@ -529,7 +529,7 @@
       const ps=c.pids.map(id=>prospects.find(p=>p.id===id)).filter(Boolean);
       const done=ps.filter(p=>p.status!=='pending').length;const pct=Math.round((done/(ps.length||1))*100);
       const card=document.createElement('div');card.className='camp-card'+(c.active?' active-c':'');
-      card.innerHTML=`<div class="camp-card-top"><div class="camp-ico"><i class="ti ti-speakerphone"></i></div><div class="camp-info"><div class="camp-name">${c.name}${c.active?' <span class="bdg b-sched" style="font-size:10px;margin-left:4px">Activa</span>':''}</div><div class="camp-meta">${ps.length} prospectos · ${done} llamados · ${c.days.slice(0,3).join(', ')}</div></div></div><div class="camp-bar"><div class="camp-bar-fill" style="width:${pct}%"></div></div><div style="font-size:12px;color:var(--text2)">${pct}% completado</div><div class="camp-actions"><button class="camp-btn activate ${c.active?'active':''}" onclick="setActiveCamp(${c.id})"><i class="ti ti-${c.active?'check':'player-play'}"></i> ${c.active?'Activa':'Activar'}</button><button class="camp-btn" onclick="renameCamp(${c.id})"><i class="ti ti-edit"></i> Renombrar</button><button class="camp-btn danger" onclick="deleteCamp(${c.id})"><i class="ti ti-trash"></i> Eliminar</button></div>`;
+      card.innerHTML=`<div class="camp-card-top"><div class="camp-ico"><i class="ti ti-speakerphone"></i></div><div class="camp-info"><div class="camp-name">${c.name}${c.active?' <span class="bdg b-sched" style="font-size:10px;margin-left:4px">Activa</span>':''}</div><div class="camp-meta">${ps.length} prospectos · ${done} llamados · ${c.days.slice(0,3).join(', ')}</div></div></div><div class="camp-bar"><div class="camp-bar-fill" style="width:${pct}%"></div></div><div style="font-size:12px;color:var(--text2)">${pct}% completado</div><div class="camp-actions"><button class="camp-btn activate ${c.active?'active':''}" onclick="setActiveCamp('${c.id}')"><i class="ti ti-${c.active?'check':'player-play'}"></i> ${c.active?'Activa':'Activar'}</button><button class="camp-btn" onclick="renameCamp('${c.id}')"><i class="ti ti-edit"></i> Renombrar</button><button class="camp-btn danger" onclick="deleteCamp('${c.id}')"><i class="ti ti-trash"></i> Eliminar</button></div>`;
       grid.appendChild(card);
     });
     if(!camps.length)grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-speakerphone" style="font-size:40px;margin-bottom:12px;display:block"></i>Sin campañas. Creá una nueva.</div>';
