@@ -66,7 +66,7 @@
     .day-scroll{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
     .day-scroll::-webkit-scrollbar{display:none}
     .daybtn{flex-shrink:0;padding:9px 18px;border-radius:100px;font-size:14px;font-weight:500;border:1.5px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s;font-family:inherit}
-    .daybtn.on{background:var(--green);border-color:var(--green);color:#fff}
+    .daybtn.on{background:transparent;border-color:var(--green);border-width:2px;color:var(--green);font-weight:700}
     .daybtn.today-btn{border-color:var(--green);color:var(--green)}
 
     /* SECTION HEADER */
@@ -246,8 +246,8 @@
     <button class="ntab" id="ntab-campaigns" onclick="switchView('campaigns')">Campañas</button>
     <button class="ntab" id="ntab-followup" onclick="switchView('followup')">Follow Up</button>
     <button class="ntab" id="ntab-import" onclick="switchView('import')">Importar</button>
-    <button class="ntab" id="ntab-trash" onclick="switchView('trash')">Papelera</button>
     <button class="ntab" id="ntab-stats" onclick="switchView('stats')">Stats</button>
+    <button class="ntab" id="ntab-trash" onclick="switchView('trash')">Papelera</button>
   </div>
 
   <!-- HOY -->
