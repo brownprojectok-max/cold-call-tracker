@@ -384,18 +384,24 @@
   let appReady = false;
 
   // ── FIREBASE SAVE ─────────────────────────────────────────────────────
+  // Store as id-keyed objects so Firebase never converts arrays to sparse objects
+  function toObj(arr){ const o={}; arr.forEach(x=>{ o[x.id]=x; }); return o; }
+  function toArray(val){if(!val)return[];if(Array.isArray(val))return val;return Object.values(val);}
+
   function save() {
     if (!appReady) return;
     setSyncStatus('syncing');
     remoteWriting = true;
-    REF.set({ prospects, camps, trash, csvLists: csvLists||[] }, err => {
+    REF.set({
+      prospects: toObj(prospects),
+      camps:     toObj(camps),
+      trash:     toObj(trash),
+      csvLists:  toObj(csvLists.map((l,i)=>({...l, id: l.id||i})))
+    }, err => {
       setSyncStatus(err ? 'off' : 'ok');
       setTimeout(() => { remoteWriting = false; }, 500);
     });
   }
-
-  // Firebase sometimes stores arrays as objects — normalize back
-  function toArray(val){if(!val)return[];if(Array.isArray(val))return val;return Object.values(val);}
 
   // ── FIREBASE LOAD & LISTEN ────────────────────────────────────────────
   REF.on('value', snap => {
@@ -419,7 +425,6 @@
       const ac = camps.find(c=>c.active);
       if (ac) document.getElementById('camp-active-name').textContent = ac.name;
     } else {
-      // Live update from desktop
       refreshCurrentView();
     }
     setSyncStatus('ok');
