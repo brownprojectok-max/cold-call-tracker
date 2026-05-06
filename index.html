@@ -315,17 +315,56 @@
   </div>
 </div>
 
-<!-- EDIT MODAL -->
+<!-- EDIT PROSPECT MODAL -->
 <div class="modal-overlay hidden" id="edit-modal" onclick="closeEditModal(event)">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-title">Editar prospecto</div>
-    <div class="field-grp"><div class="field-lbl">Nombre</div><input class="field-input" id="edit-name" /></div>
-    <div class="field-grp"><div class="field-lbl">Empresa</div><input class="field-input" id="edit-co" /></div>
-    <div class="field-grp"><div class="field-lbl">Teléfono</div><input class="field-input" id="edit-ph" type="tel" /></div>
+    <div class="field-grp"><div class="field-lbl">Nombre</div><input class="field-input" id="edit-name" placeholder="Nombre completo" /></div>
+    <div class="field-grp"><div class="field-lbl">Empresa</div><input class="field-input" id="edit-co" placeholder="Empresa" /></div>
+    <div class="field-grp"><div class="field-lbl">Teléfono</div><input class="field-input" id="edit-ph" type="tel" placeholder="+34 6XX XXX XXX" /></div>
+    <div class="field-grp"><div class="field-lbl">Email</div><input class="field-input" id="edit-email" type="email" placeholder="email@empresa.com" /></div>
+    <div class="field-grp"><div class="field-lbl">Estado</div>
+      <select class="field-input" id="edit-status">
+        <option value="pending">Sin llamar</option>
+        <option value="called">Llamado</option>
+        <option value="scheduled">Cita agendada</option>
+        <option value="followup">Follow Up</option>
+        <option value="not-interested">No interesado</option>
+      </select>
+    </div>
+    <div class="field-grp"><div class="field-lbl">Nota</div><textarea class="field-input" id="edit-note" style="height:80px;resize:none" placeholder="Notas sobre este prospecto..."></textarea></div>
     <div style="display:flex;gap:10px">
       <button class="btn-secondary" style="flex:1" onclick="closeEditModal()">Cancelar</button>
       <button class="btn-primary" style="flex:1" onclick="saveEdit()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT CAMPAIGN MODAL -->
+<div class="modal-overlay hidden" id="edit-camp-modal" onclick="closeEditCampModal(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Editar campaña</div>
+    <div class="field-grp"><div class="field-lbl">Nombre de la campaña</div><input class="field-input" id="ec-name" placeholder="Nombre" /></div>
+    <div class="field-grp">
+      <div class="field-lbl">Días activos</div>
+      <div class="day-grid" id="ec-days">
+        <button class="dtog" onclick="this.classList.toggle('on')">Lunes</button>
+        <button class="dtog" onclick="this.classList.toggle('on')">Martes</button>
+        <button class="dtog" onclick="this.classList.toggle('on')">Miércoles</button>
+        <button class="dtog" onclick="this.classList.toggle('on')">Jueves</button>
+        <button class="dtog" onclick="this.classList.toggle('on')">Viernes</button>
+        <button class="dtog" onclick="this.classList.toggle('on')">Sábado</button>
+      </div>
+    </div>
+    <div class="field-grp">
+      <div class="field-lbl">Prospectos incluidos</div>
+      <div style="background:var(--bg);border-radius:var(--r-md);padding:0 12px;max-height:200px;overflow-y:auto;border:.5px solid var(--border2)" id="ec-prospects"></div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn-secondary" style="flex:1" onclick="closeEditCampModal()">Cancelar</button>
+      <button class="btn-primary" style="flex:1" onclick="saveEditCamp()">Guardar campaña</button>
     </div>
   </div>
 </div>
@@ -560,10 +599,70 @@
     refreshProg();refreshFuDot();renderTrash();
   }
 
-  // ── EDIT MODAL ────────────────────────────────────────────────────────
-  function openEditModal(id){editingId=id;const p=prospects.find(x=>x.id===id);document.getElementById('edit-name').value=p.name;document.getElementById('edit-co').value=p.co;document.getElementById('edit-ph').value=p.ph;document.getElementById('edit-modal').classList.remove('hidden');}
+  // ── EDIT PROSPECT MODAL ───────────────────────────────────────────────
+  function openEditModal(id){
+    editingId=id;
+    const p=prospects.find(x=>x.id===id);
+    document.getElementById('edit-name').value=p.name||'';
+    document.getElementById('edit-co').value=p.co||'';
+    document.getElementById('edit-ph').value=p.ph||'';
+    document.getElementById('edit-email').value=p.email||'';
+    document.getElementById('edit-status').value=p.status||'pending';
+    document.getElementById('edit-note').value=p.note||'';
+    document.getElementById('edit-modal').classList.remove('hidden');
+  }
   function closeEditModal(e){if(e&&e.target!==document.getElementById('edit-modal'))return;document.getElementById('edit-modal').classList.add('hidden');editingId=null;}
-  function saveEdit(){const p=prospects.find(x=>x.id===editingId);p.name=document.getElementById('edit-name').value.trim()||p.name;p.co=document.getElementById('edit-co').value.trim();p.ph=document.getElementById('edit-ph').value.trim()||p.ph;save();document.getElementById('edit-modal').classList.add('hidden');reRenderCard(editingId);editingId=null;}
+  function saveEdit(){
+    const p=prospects.find(x=>x.id===editingId);
+    p.name  = document.getElementById('edit-name').value.trim()||p.name;
+    p.co    = document.getElementById('edit-co').value.trim();
+    p.ph    = document.getElementById('edit-ph').value.trim()||p.ph;
+    p.email = document.getElementById('edit-email').value.trim();
+    p.status= document.getElementById('edit-status').value;
+    p.note  = document.getElementById('edit-note').value.trim();
+    if(p.status==='pending') p.followup=null;
+    save();
+    document.getElementById('edit-modal').classList.add('hidden');
+    reRenderCard(editingId);
+    editingId=null;
+    refreshProg(); refreshFuDot();
+  }
+
+  // ── EDIT CAMPAIGN MODAL ───────────────────────────────────────────────
+  let editingCampId=null;
+  function openEditCamp(id){
+    editingCampId=id;
+    const c=camps.find(x=>x.id===id);
+    document.getElementById('ec-name').value=c.name||'';
+    // Set day toggles
+    const dayBtns=document.querySelectorAll('#ec-days .dtog');
+    dayBtns.forEach(btn=>{ btn.classList.toggle('on', c.days.includes(btn.textContent)); });
+    // Populate prospect checkboxes
+    const pl=document.getElementById('ec-prospects');
+    pl.innerHTML='';
+    prospects.forEach(p=>{
+      const inCamp=c.pids.includes(String(p.id));
+      const r=document.createElement('div');
+      r.className='pselrow';
+      r.innerHTML=`<div class="chk${inCamp?' on':''}" id="ecp-${p.id}" onclick="this.classList.toggle('on');this.innerHTML=this.classList.contains('on')?'<i class=\\'ti ti-check\\'></i>':''"> ${inCamp?'<i class="ti ti-check"></i>':''}</div><div><div class="pselname">${p.name}</div><div class="pselco">${p.co}</div></div>`;
+      pl.appendChild(r);
+    });
+    document.getElementById('edit-camp-modal').classList.remove('hidden');
+  }
+  function closeEditCampModal(e){if(e&&e.target!==document.getElementById('edit-camp-modal'))return;document.getElementById('edit-camp-modal').classList.add('hidden');editingCampId=null;}
+  function saveEditCamp(){
+    const c=camps.find(x=>x.id===editingCampId);
+    c.name=document.getElementById('ec-name').value.trim()||c.name;
+    c.days=[...document.querySelectorAll('#ec-days .dtog.on')].map(el=>el.textContent);
+    c.pids=prospects.filter(p=>document.getElementById('ecp-'+p.id)?.classList.contains('on')).map(p=>String(p.id));
+    // Refresh today flags if this is the active campaign
+    if(c.active) prospects.forEach(p=>{p.today=c.pids.includes(String(p.id));});
+    if(c.active) document.getElementById('camp-active-name').textContent=c.name;
+    save();
+    document.getElementById('edit-camp-modal').classList.add('hidden');
+    editingCampId=null;
+    renderCamps(); renderToday(); refreshProg();
+  }
 
   // ── PROGRESS ──────────────────────────────────────────────────────────
   function refreshProg(){const tp=prospects.filter(x=>x.today);const done=tp.filter(x=>x.status!=='pending').length;const pct=Math.round((done/(tp.length||1))*100);document.getElementById('prog-num').textContent=done+'/'+tp.length;document.getElementById('prog-bar').style.width=pct+'%';}
